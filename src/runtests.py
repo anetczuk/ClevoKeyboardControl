@@ -37,13 +37,6 @@ import argparse
 import cProfile
 import subprocess
 
-try:
-    import coverage
-except ImportError:
-    print( "Missing coverage module. Try running 'pip install coverage'" )
-    print( "Python info:", sys.version )
-    raise
-
 import tempfile
 
 
@@ -65,6 +58,13 @@ if __name__ == '__main__':
     coverageData = None
     ## start code coverage
     if args.coverage == True:
+        try:
+            import coverage
+        except ImportError:
+            print( "Missing coverage module. Try running 'pip install coverage'" )
+            print( "Python info:", sys.version )
+            raise
+
         print( "Executing code coverage" )
         currScript = os.path.realpath(__file__)
         coverageData = coverage.Coverage(branch=True, omit=currScript)
