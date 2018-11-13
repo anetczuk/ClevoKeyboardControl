@@ -81,6 +81,14 @@ class ClevoDriver():
     def __init__(self):
         pass
     
+    def getState(self):
+        value = int( self.read(self.STATE_PATH) )
+        _LOGGER.debug("got state: %r",  value)
+        if value == 0:
+            return False
+        else:
+            return True
+    
     def setState(self, enabled: bool):
         _LOGGER.debug("setting led state: %i",  enabled)
         if enabled == True:
@@ -88,16 +96,47 @@ class ClevoDriver():
         else:
             self.store( self.STATE_PATH, 0 )
     
+    def getBrightness(self):
+        value = int( self.read(self.BRIGHTNESS_PATH) )
+        _LOGGER.debug("got brightness: %r",  value)
+        return value   
+    
     def setBrightness(self, value: int):
         _LOGGER.debug("setting brightness: %i",  value)
         value = max(value, 0)
         value = min(value, 255)
         self.store( self.BRIGHTNESS_PATH, value )
         
+    def getMode(self):
+        value = int( self.read(self.MODE_PATH) )
+        enumVal = Mode( value )
+        _LOGGER.debug("got mode: %r",  enumVal)
+        return enumVal   
+        
     def setMode(self, mode: Mode):
         _LOGGER.debug("setting mode: %s",  mode)
         self.store( self.MODE_PATH, mode.value )
+    
+    def getColorLeft(self):
+        return self.getColor(Panel.Left)
         
+    def getColorCenter(self):
+        return self.getColor(Panel.Center)
+        
+    def getColorRight(self):
+        return self.getColor(Panel.Right)
+    
+    def getColor(self, panel):
+        file = self._getPanelFile( panel )
+        hexString = self.read(file)
+        value = int(hexString, 16)
+        red = (value >> 16) & 255
+        green = (value >> 8) & 255
+        blue = value & 255
+        retColor = [red, green, blue]
+        _LOGGER.debug("got color for %s: %r", panel, retColor)
+        return retColor
+    
     def setColorLeft(self, red, green, blue):
         self.setColor( Panel.Left, red, green, blue )
         

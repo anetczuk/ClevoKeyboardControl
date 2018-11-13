@@ -28,7 +28,7 @@ import logging
 from . import uiloader
 from . import tray_icon
 from . import resources
-from .qt import qApp, QApplication, QIcon, QtCore
+from .qt import qApp, QApplication, QIcon, QtCore, QtGui
 
 from ..clevoio import Mode as ClevoMode
 
@@ -61,15 +61,18 @@ class MainWindow(QtBaseClass):
         ##self.ui.appSettings.stateInfoChanged.connect( self.trayIcon.setInfo )
         self.trayIcon.show()
         
+        self._initModeCB()
         
-        ## ============ controls ====================
+        ## read driver state
+        self.refreshWidgets()
         
+        ## connect signals
         self.ui.stateCB.stateChanged.connect( self._toggleLED )
         
         self.ui.brightnessSlider.valueChanged.connect( self._brightnessChanged )
         self._setBrightnessLabel( self.ui.brightnessSlider.value() )
         
-        self._initModeCB()
+        self.ui.modeCB.currentIndexChanged.connect( self._modeChanged )
         
         self.ui.leftColor.colorChanged.connect( self._leftColorChanged )
         self.ui.centerColor.colorChanged.connect( self._centerColorChanged )
@@ -79,6 +82,36 @@ class MainWindow(QtBaseClass):
         self.ui.setToAllCenterPB.clicked.connect( self._setCenterToAll )
         self.ui.setToAllRightPB.clicked.connect( self._setRightToAll )
 
+
+    def refreshWidgets(self):
+        ledOn = self.driver.getState()
+        self.ui.stateCB.setChecked( ledOn )
+        
+        brightness = self.driver.getBrightness()
+        self.ui.brightnessSlider.setValue( brightness )
+        self._setBrightnessLabel( brightness )
+        
+        mode = self.driver.getMode()
+        self.ui.modeCB.setCurrentIndex( mode.value )
+        
+        leftPanelColor = self.driver.getColorLeft()
+        leftColor = self.toQColor( leftPanelColor )
+        self.ui.leftColor.updateWidget( leftColor )
+
+        centerPanelColor = self.driver.getColorCenter()
+        centerColor = self.toQColor( centerPanelColor )
+        self.ui.centerColor.updateWidget( centerColor )
+
+        rightPanelColor = self.driver.getColorRight()
+        rightColor = self.toQColor( rightPanelColor )
+        self.ui.rightColor.updateWidget( rightColor )
+        
+    @staticmethod
+    def toQColor(driverColor):
+        red = driverColor[0]
+        green = driverColor[1]
+        blue = driverColor[2]
+        return QtGui.QColor( red, green, blue )
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
@@ -101,7 +134,6 @@ class MainWindow(QtBaseClass):
     def _initModeCB(self):
         for item in ClevoMode:
             self.ui.modeCB.addItem( item.name, item )
-        self.ui.modeCB.currentIndexChanged.connect( self._modeChanged )
         
     def _modeChanged(self):
         selectedMode = self.ui.modeCB.currentData()

@@ -63,9 +63,12 @@ class ColorWidget(QtBaseClass):
         return color
 
     def setColor(self, color):
+        self.updateWidget( color )
+        self.colorChanged.emit( color )
+
+    def updateWidget(self, color):
         self._updateSpinColor( color )
         self._updatePreviewColor(color)
-        self.colorChanged.emit( color )
 
     def _colorChanged(self, value):
         color = self.getColor()
