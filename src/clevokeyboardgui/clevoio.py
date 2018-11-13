@@ -25,7 +25,7 @@
 import os
 import logging
 
-from enum import Enum, unique
+from enum import Enum, unique, auto
 
 
 
@@ -61,28 +61,30 @@ class Mode(Enum):
 
 @unique
 class Panel(Enum):
-    Left    = 0
-    Center  = 1
-    Right   = 2
+    Left    = auto()
+    Center  = auto()
+    Right   = auto()
+
+
+@unique
+class FilePath(Enum):
+    ROOT_PATH           = auto()
+    STATE_PATH          = auto()
+    BRIGHTNESS_PATH     = auto()
+    MODE_PATH           = auto()
+    COLOR_LEFT_PATH     = auto()
+    COLOR_CENTER_PATH   = auto()
+    COLOR_RIGHT_PATH    = auto()
 
 
 
 class ClevoDriver():
-
-    DRIVERFS_PATH       = '/sys/devices/platform/tuxedo_keyboard'
-    STATE_PATH          = DRIVERFS_PATH + '/state'
-    BRIGHTNESS_PATH     = DRIVERFS_PATH + '/brightness'
-    MODE_PATH           = DRIVERFS_PATH + '/mode'
-    COLOR_LEFT_PATH     = DRIVERFS_PATH + '/color_left'
-    COLOR_CENTER_PATH   = DRIVERFS_PATH + '/color_center'
-    COLOR_RIGHT_PATH    = DRIVERFS_PATH + '/color_right'
-    
     
     def __init__(self):
         pass
     
     def getState(self):
-        value = int( self.read(self.STATE_PATH) )
+        value = int( self._read(FilePath.STATE_PATH) )
         _LOGGER.debug("got state: %r",  value)
         if value == 0:
             return False
@@ -92,12 +94,12 @@ class ClevoDriver():
     def setState(self, enabled: bool):
         _LOGGER.debug("setting led state: %i",  enabled)
         if enabled == True:
-            self.store( self.STATE_PATH, 1 )
+            self._store( FilePath.STATE_PATH, 1 )
         else:
-            self.store( self.STATE_PATH, 0 )
+            self._store( FilePath.STATE_PATH, 0 )
     
     def getBrightness(self):
-        value = int( self.read(self.BRIGHTNESS_PATH) )
+        value = int( self._read(FilePath.BRIGHTNESS_PATH) )
         _LOGGER.debug("got brightness: %r",  value)
         return value   
     
@@ -105,17 +107,17 @@ class ClevoDriver():
         _LOGGER.debug("setting brightness: %i",  value)
         value = max(value, 0)
         value = min(value, 255)
-        self.store( self.BRIGHTNESS_PATH, value )
+        self._store( FilePath.BRIGHTNESS_PATH, value )
         
     def getMode(self):
-        value = int( self.read(self.MODE_PATH) )
+        value = int( self._read(FilePath.MODE_PATH) )
         enumVal = Mode( value )
         _LOGGER.debug("got mode: %r",  enumVal)
         return enumVal   
         
     def setMode(self, mode: Mode):
         _LOGGER.debug("setting mode: %s",  mode)
-        self.store( self.MODE_PATH, mode.value )
+        self._store( FilePath.MODE_PATH, mode.value )
     
     def getColorLeft(self):
         return self.getColor(Panel.Left)
@@ -127,8 +129,8 @@ class ClevoDriver():
         return self.getColor(Panel.Right)
     
     def getColor(self, panel):
-        file = self._getPanelFile( panel )
-        hexString = self.read(file)
+        fileType = self._getPanelFile( panel )
+        hexString = self._read( fileType )
         value = int(hexString, 16)
         red = (value >> 16) & 255
         green = (value >> 8) & 255
@@ -151,19 +153,21 @@ class ClevoDriver():
         hexValue = hex(colorValue)
         _LOGGER.debug("setting color for %s: %s", panel.name, hexValue)
         file = self._getPanelFile( panel )
-        self.store( file, hexValue )
+        self._store( file, hexValue )
     
     def _getPanelFile(self, panel: Panel):
         if panel == Panel.Left:
-            return self.COLOR_LEFT_PATH
+            return FilePath.COLOR_LEFT_PATH
         elif panel == Panel.Center:
-            return self.COLOR_CENTER_PATH
+            return FilePath.COLOR_CENTER_PATH
         elif panel == Panel.Right:
-            return self.COLOR_RIGHT_PATH
+            return FilePath.COLOR_RIGHT_PATH
         else:
             raise ValueError("unhandled value: " + str(panel))
+        
     
-    def read(self, filePath: str):
+    def _read(self, fileType: FilePath):
+        filePath = self._getFile( fileType )
         file = None
         try:
             file = open( filePath, "r")
@@ -177,7 +181,8 @@ class ClevoDriver():
             if file != None:
                 file.close()
     
-    def store(self, filePath: str, value: str):
+    def _store(self, fileType: FilePath, value: str):
+        filePath = self._getFile( fileType )
         fd = None
         try:
             fd = os.open( filePath, os.O_WRONLY)
@@ -188,5 +193,37 @@ class ClevoDriver():
         finally:
             if fd != None:
                 os.close(fd)
+                
+    def _getFile(self, fileType: FilePath):
+        raise NotImplementedError('You need to define this method in derived class!')
     
+    
+    
+class TuxedoDriver( ClevoDriver ):
+
+    DRIVERFS_PATH       = '/sys/devices/platform/tuxedo_keyboard'
+    
+    STATE_PATH          = DRIVERFS_PATH + '/state'
+    BRIGHTNESS_PATH     = DRIVERFS_PATH + '/brightness'
+    MODE_PATH           = DRIVERFS_PATH + '/mode'
+    COLOR_LEFT_PATH     = DRIVERFS_PATH + '/color_left'
+    COLOR_CENTER_PATH   = DRIVERFS_PATH + '/color_center'
+    COLOR_RIGHT_PATH    = DRIVERFS_PATH + '/color_right'
+    
+    filePaths = {
+        FilePath.ROOT_PATH:         DRIVERFS_PATH,
+        FilePath.STATE_PATH:        STATE_PATH,
+        FilePath.BRIGHTNESS_PATH:   BRIGHTNESS_PATH,
+        FilePath.MODE_PATH:         MODE_PATH,
+        FilePath.COLOR_LEFT_PATH:   COLOR_LEFT_PATH,
+        FilePath.COLOR_CENTER_PATH: COLOR_CENTER_PATH,
+        FilePath.COLOR_RIGHT_PATH:  COLOR_RIGHT_PATH
+    }
+    
+    
+    def __init__(self):
+        super().__init__()
+    
+    def _getFile(self, fileType: FilePath):
+        return self.filePaths[ fileType ]
     

@@ -51,6 +51,10 @@ can be run by *testclevokeyboardgui/gui/main_window_example.py*.
 - code coverage (*coverage*)
 
 
+## ToDo
+- add support for old *clevo-wmi* driver
+
+
 ## References
 - https://github.com/tuxedocomputers/tuxedo-keyboard
 

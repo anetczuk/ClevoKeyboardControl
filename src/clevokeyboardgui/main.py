@@ -40,7 +40,7 @@ import cProfile
 
 import clevokeyboardgui.logger as logger
 
-from clevokeyboardgui.clevoio import ClevoDriver
+from clevokeyboardgui.clevoio import TuxedoDriver
 
 from clevokeyboardgui.gui.main_window import MainWindow
 from clevokeyboardgui.gui.qt import QApplication
@@ -55,7 +55,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def runApp(args):
     
-    driver = ClevoDriver()
+    driver = TuxedoDriver()
     
     ## GUI
     app = QApplication(sys.argv)
