@@ -49,6 +49,8 @@ class MainWindow(QtBaseClass):
     
         self.driver = driver
         
+        self.ui.actionExit.triggered.connect( qApp.quit )
+        
         imgDir = resources.getImagePath('keyboard-white.png')
         appIcon = QIcon( imgDir )
         self.setWindowIcon( appIcon )
