@@ -13,9 +13,9 @@ TODO: add screenshots
 
 
 ## Requirements
-- Clevo based device
-- PyQt5
-- tuxedo-keyboard
+- *Clevo* based device
+- *PyQt5*
+- *tuxedo-keyboard* driver
 
 For more info about installing *tuxedo-keyboard* driver visit:
 https://github.com/tuxedocomputers/tuxedo-keyboard
@@ -44,9 +44,14 @@ can be run by *testclevokeyboardgui/gui/main_window_example.py*.
 - testclevokeyboardgui -- unit tests for the application
 
 
-## Examples of use of not obvious Python mechanisms:
+## Examples of use of not obvious Python mechanisms
 - properly killing (Ctrl+C) PyQt (*sigint.py*)
 - loading of UI files and inheriting from it
 - code profiling (*cProfile*)
 - code coverage (*coverage*)
+
+
+## References
+- https://github.com/tuxedocomputers/tuxedo-keyboard
+
 
