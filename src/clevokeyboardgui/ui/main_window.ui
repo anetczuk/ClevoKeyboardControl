@@ -115,7 +115,7 @@
       <item>
        <widget class="QPushButton" name="setToAllLeftPB">
         <property name="text">
-         <string>PushButton</string>
+         <string>Set To All</string>
         </property>
        </widget>
       </item>
@@ -142,7 +142,7 @@
       <item>
        <widget class="QPushButton" name="setToAllCenterPB">
         <property name="text">
-         <string>PushButton</string>
+         <string>Set To All</string>
         </property>
        </widget>
       </item>
@@ -169,7 +169,7 @@
       <item>
        <widget class="QPushButton" name="setToAllRightPB">
         <property name="text">
-         <string>PushButton</string>
+         <string>Set To All</string>
         </property>
        </widget>
       </item>

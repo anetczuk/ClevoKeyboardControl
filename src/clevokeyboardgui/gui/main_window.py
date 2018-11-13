@@ -75,6 +75,10 @@ class MainWindow(QtBaseClass):
         self.ui.centerColor.colorChanged.connect( self._centerColorChanged )
         self.ui.rightColor.colorChanged.connect( self._rightColorChanged )
 
+        self.ui.setToAllLeftPB.clicked.connect( self._setLeftToAll )
+        self.ui.setToAllCenterPB.clicked.connect( self._setCenterToAll )
+        self.ui.setToAllRightPB.clicked.connect( self._setRightToAll )
+
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
@@ -104,15 +108,40 @@ class MainWindow(QtBaseClass):
         self.driver.setMode( selectedMode )
         
         
-    def _leftColorChanged(self, red, green, blue):
+    def _leftColorChanged(self, color):
+        red = color.red()
+        green = color.green()
+        blue = color.blue()
         self.driver.setColorLeft( red, green, blue )
         
-    def _centerColorChanged(self, red, green, blue):
+    def _centerColorChanged(self, color):
+        red = color.red()
+        green = color.green()
+        blue = color.blue()
         self.driver.setColorCenter( red, green, blue )
         
-    def _rightColorChanged(self, red, green, blue):
+    def _rightColorChanged(self, color):
+        red = color.red()
+        green = color.green()
+        blue = color.blue()
         self.driver.setColorRight( red, green, blue )
 
+
+    def _setLeftToAll(self):
+        color = self.ui.leftColor.getColor()
+        self.ui.centerColor.setColor(color)
+        self.ui.rightColor.setColor(color)
+    
+    def _setCenterToAll(self):
+        color = self.ui.centerColor.getColor()
+        self.ui.leftColor.setColor(color)
+        self.ui.rightColor.setColor(color)
+    
+    def _setRightToAll(self):
+        color = self.ui.rightColor.getColor()
+        self.ui.leftColor.setColor(color)
+        self.ui.centerColor.setColor(color)
+    
 
     def loadSettings(self):
         settings = self.getSettings()

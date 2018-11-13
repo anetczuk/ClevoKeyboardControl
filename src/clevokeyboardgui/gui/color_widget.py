@@ -40,7 +40,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class ColorWidget(QtBaseClass):
     
-    colorChanged   = pyqtSignal(int, int, int)      ## passes RGB value
+    colorChanged   = pyqtSignal( QtGui.QColor )      ## passes RGB value
     
     
     def __init__(self, parentWidget = None):
@@ -55,19 +55,31 @@ class ColorWidget(QtBaseClass):
         
         self.ui.pickColorPB.clicked.connect(self._pickColor)
 
-    def _colorChanged(self, value):
+    def getColor(self):
         red = self.ui.redSB.value()
         green = self.ui.greenSB.value()
         blue = self.ui.blueSB.value()
         color = QtGui.QColor(red, green, blue)
-        self._updateColor(color)
+        return color
+
+    def setColor(self, color):
+        self._updateSpinColor( color )
+        self._updatePreviewColor(color)
+        self.colorChanged.emit( color )
+
+    def _colorChanged(self, value):
+        color = self.getColor()
+        self._updatePreviewColor(color)
+        self.colorChanged.emit( color )
         
     def _pickColor(self):
         color = QtWidgets.QColorDialog.getColor()
         if color.isValid() == False:
             _LOGGER.info("picked color is invalid")
             return
+        self.setColor( color )
         
+    def _updateSpinColor(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
@@ -76,19 +88,11 @@ class ColorWidget(QtBaseClass):
         self.ui.redSB.setValue( red )
         self.ui.greenSB.setValue( green )
         self.ui.blueSB.setValue( blue )
-        
         self.blockSignals( False )
-        self._updateColor(color)
 
-    def _updateColor(self, color):
-        ## update preview
+    def _updatePreviewColor(self, color):
         pal = self.ui.colorPreview.palette();
         pal.setColor(QtGui.QPalette.Background, color);
         self.ui.colorPreview.setAutoFillBackground(True);
         self.ui.colorPreview.setPalette(pal);
-        
-        ## emit signal
-        red = color.red()
-        green = color.green()
-        blue = color.blue()
-        self.colorChanged.emit(red, green, blue)
+
