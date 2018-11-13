@@ -30,6 +30,8 @@ from . import tray_icon
 from . import resources
 from .qt import qApp, QApplication, QIcon, QtCore
 
+from ..clevoio import Mode as ClevoMode
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,10 +41,13 @@ UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
 class MainWindow(QtBaseClass):
-    def __init__(self):
+    
+    def __init__(self, driver):
         super().__init__()
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
+    
+        self.driver = driver
         
         imgDir = resources.getImagePath('keyboard-white.png')
         appIcon = QIcon( imgDir )
@@ -55,6 +60,59 @@ class MainWindow(QtBaseClass):
         ##self.ui.appSettings.showMessage.connect( self.trayIcon.displayMessage )
         ##self.ui.appSettings.stateInfoChanged.connect( self.trayIcon.setInfo )
         self.trayIcon.show()
+        
+        
+        ## ============ controls ====================
+        
+        self.ui.stateCB.stateChanged.connect( self._toggleLED )
+        
+        self.ui.brightnessSlider.valueChanged.connect( self._brightnessChanged )
+        self._setBrightnessLabel( self.ui.brightnessSlider.value() )
+        
+        self._initModeCB()
+        
+        self.ui.leftColor.colorChanged.connect( self._leftColorChanged )
+        self.ui.centerColor.colorChanged.connect( self._centerColorChanged )
+        self.ui.rightColor.colorChanged.connect( self._rightColorChanged )
+
+
+    def _toggleLED(self, state):
+        ## state: 0 -- unchecked
+        ## state: 2 -- checked
+        enabled = (state != 0)
+        self.driver.setState( enabled )
+
+    def _brightnessChanged(self, value: int):
+        self.driver.setBrightness( value )
+        self._setBrightnessLabel( value )
+
+    def _setBrightnessLabel(self, value: int):
+        valueString = str(value)
+        if len(valueString) == 1:
+            valueString = "00" + valueString
+        elif len(valueString) == 2:
+            valueString = "0" + valueString
+        self.ui.brightnessValue.setText( valueString )
+
+    def _initModeCB(self):
+        for item in ClevoMode:
+            self.ui.modeCB.addItem( item.name, item )
+        self.ui.modeCB.currentIndexChanged.connect( self._modeChanged )
+        
+    def _modeChanged(self):
+        selectedMode = self.ui.modeCB.currentData()
+        self.driver.setMode( selectedMode )
+        
+        
+    def _leftColorChanged(self, red, green, blue):
+        self.driver.setColorLeft( red, green, blue )
+        
+    def _centerColorChanged(self, red, green, blue):
+        self.driver.setColorCenter( red, green, blue )
+        
+    def _rightColorChanged(self, red, green, blue):
+        self.driver.setColorRight( red, green, blue )
+
 
     def loadSettings(self):
         settings = self.getSettings()

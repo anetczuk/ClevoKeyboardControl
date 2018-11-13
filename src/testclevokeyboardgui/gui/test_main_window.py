@@ -25,6 +25,8 @@
 import sys
 import unittest
 
+from testclevokeyboardgui.clevodrivermock import ClevoDriverMock
+
 from clevokeyboardgui.gui.qt import QApplication
 
 from clevokeyboardgui.gui.main_window import MainWindow as TestWidget
@@ -38,11 +40,13 @@ app = QApplication(sys.argv)
 class MainWindowTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
-        self.widget = TestWidget()
+        self.driver = ClevoDriverMock()
+        self.widget = TestWidget( self.driver )
   
     def tearDown(self):
         ## Called after testfunction was executed
         self.widget = None
+        self.driver = None
        
     def test_test(self):
         self.assertTrue(True)

@@ -40,6 +40,8 @@ import cProfile
 
 import clevokeyboardgui.logger as logger
 
+from clevokeyboardgui.clevoio import ClevoDriver
+
 from clevokeyboardgui.gui.main_window import MainWindow
 from clevokeyboardgui.gui.qt import QApplication
 from clevokeyboardgui.gui.sigint import setup_interrupt_handling 
@@ -52,10 +54,14 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def runApp(args):
+    
+    driver = ClevoDriver()
+    
     ## GUI
     app = QApplication(sys.argv)
                   
-    window = MainWindow()
+    window = MainWindow( driver )
+    
     window.loadSettings()     
          
     window.show()

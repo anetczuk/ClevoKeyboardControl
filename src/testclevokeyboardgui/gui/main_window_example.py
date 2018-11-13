@@ -37,6 +37,8 @@ import logging
 
 import clevokeyboardgui.logger as logger
 
+from testclevokeyboardgui.clevodrivermock import ClevoDriverMock
+
 from clevokeyboardgui.gui.qt import QApplication
 from clevokeyboardgui.gui.sigint import setup_interrupt_handling 
 from clevokeyboardgui.gui.main_window import MainWindow
@@ -74,9 +76,11 @@ exitCode = 0
 
 try:
 
+    driver = ClevoDriverMock()
+    
     app = QApplication(sys.argv)
     
-    window = MainWindow()
+    window = MainWindow(driver)
     window.loadSettings()
     
     window.show()
