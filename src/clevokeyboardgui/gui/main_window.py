@@ -28,9 +28,8 @@ import logging
 from . import uiloader
 from . import tray_icon
 from . import resources
-from .qt import qApp, QApplication, QIcon, QtCore, QtGui
+from .qt import qApp, QApplication, QIcon, QtCore
 
-from ..clevoio import Mode as ClevoMode
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,7 +46,7 @@ class MainWindow(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
     
-        self.driver = driver
+        self.ui.driverWidget.attachDriver( driver )
         
         self.ui.actionExit.triggered.connect( qApp.quit )
         
@@ -62,119 +61,6 @@ class MainWindow(QtBaseClass):
         ##self.ui.appSettings.showMessage.connect( self.trayIcon.displayMessage )
         ##self.ui.appSettings.stateInfoChanged.connect( self.trayIcon.setInfo )
         self.trayIcon.show()
-        
-        self._initModeCB()
-        
-        ## read driver state
-        self.refreshWidgets()
-        
-        ## connect signals
-        self.ui.stateCB.stateChanged.connect( self._toggleLED )
-        
-        self.ui.brightnessSlider.valueChanged.connect( self._brightnessChanged )
-        self._setBrightnessLabel( self.ui.brightnessSlider.value() )
-        
-        self.ui.modeCB.currentIndexChanged.connect( self._modeChanged )
-        
-        self.ui.leftColor.colorChanged.connect( self._leftColorChanged )
-        self.ui.centerColor.colorChanged.connect( self._centerColorChanged )
-        self.ui.rightColor.colorChanged.connect( self._rightColorChanged )
-
-        self.ui.setToAllLeftPB.clicked.connect( self._setLeftToAll )
-        self.ui.setToAllCenterPB.clicked.connect( self._setCenterToAll )
-        self.ui.setToAllRightPB.clicked.connect( self._setRightToAll )
-
-
-    def refreshWidgets(self):
-        ledOn = self.driver.getState()
-        self.ui.stateCB.setChecked( ledOn )
-        
-        brightness = self.driver.getBrightness()
-        self.ui.brightnessSlider.setValue( brightness )
-        self._setBrightnessLabel( brightness )
-        
-        mode = self.driver.getMode()
-        self.ui.modeCB.setCurrentIndex( mode.value )
-        
-        leftPanelColor = self.driver.getColorLeft()
-        leftColor = self.toQColor( leftPanelColor )
-        self.ui.leftColor.updateWidget( leftColor )
-
-        centerPanelColor = self.driver.getColorCenter()
-        centerColor = self.toQColor( centerPanelColor )
-        self.ui.centerColor.updateWidget( centerColor )
-
-        rightPanelColor = self.driver.getColorRight()
-        rightColor = self.toQColor( rightPanelColor )
-        self.ui.rightColor.updateWidget( rightColor )
-        
-    @staticmethod
-    def toQColor(driverColor):
-        red = driverColor[0]
-        green = driverColor[1]
-        blue = driverColor[2]
-        return QtGui.QColor( red, green, blue )
-
-    def _toggleLED(self, state):
-        ## state: 0 -- unchecked
-        ## state: 2 -- checked
-        enabled = (state != 0)
-        self.driver.setState( enabled )
-
-    def _brightnessChanged(self, value: int):
-        self.driver.setBrightness( value )
-        self._setBrightnessLabel( value )
-
-    def _setBrightnessLabel(self, value: int):
-        valueString = str(value)
-        if len(valueString) == 1:
-            valueString = "00" + valueString
-        elif len(valueString) == 2:
-            valueString = "0" + valueString
-        self.ui.brightnessValue.setText( valueString )
-
-    def _initModeCB(self):
-        for item in ClevoMode:
-            self.ui.modeCB.addItem( item.name, item )
-        
-    def _modeChanged(self):
-        selectedMode = self.ui.modeCB.currentData()
-        self.driver.setMode( selectedMode )
-        
-        
-    def _leftColorChanged(self, color):
-        red = color.red()
-        green = color.green()
-        blue = color.blue()
-        self.driver.setColorLeft( red, green, blue )
-        
-    def _centerColorChanged(self, color):
-        red = color.red()
-        green = color.green()
-        blue = color.blue()
-        self.driver.setColorCenter( red, green, blue )
-        
-    def _rightColorChanged(self, color):
-        red = color.red()
-        green = color.green()
-        blue = color.blue()
-        self.driver.setColorRight( red, green, blue )
-
-
-    def _setLeftToAll(self):
-        color = self.ui.leftColor.getColor()
-        self.ui.centerColor.setColor(color)
-        self.ui.rightColor.setColor(color)
-    
-    def _setCenterToAll(self):
-        color = self.ui.centerColor.getColor()
-        self.ui.leftColor.setColor(color)
-        self.ui.rightColor.setColor(color)
-    
-    def _setRightToAll(self):
-        color = self.ui.rightColor.getColor()
-        self.ui.leftColor.setColor(color)
-        self.ui.centerColor.setColor(color)
     
 
     def loadSettings(self):
