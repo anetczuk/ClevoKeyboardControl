@@ -49,9 +49,9 @@ class ColorWidget(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
         
-        self.ui.redSB.valueChanged.connect( self._colorChanged )
-        self.ui.greenSB.valueChanged.connect( self._colorChanged )
-        self.ui.blueSB.valueChanged.connect( self._colorChanged )
+        self.ui.redSB.valueChanged.connect( self.emitColor )
+        self.ui.greenSB.valueChanged.connect( self.emitColor )
+        self.ui.blueSB.valueChanged.connect( self.emitColor )
         
         self.ui.pickColorPB.clicked.connect(self._pickColor)
 
@@ -70,7 +70,7 @@ class ColorWidget(QtBaseClass):
         self._updateSpinColor( color )
         self._updatePreviewColor(color)
 
-    def _colorChanged(self, value):
+    def emitColor(self):
         color = self.getColor()
         self._updatePreviewColor(color)
         self.colorChanged.emit( color )

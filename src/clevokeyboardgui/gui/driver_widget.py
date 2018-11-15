@@ -50,6 +50,9 @@ class DriverWidget(QtBaseClass):
         self._initModeCB()
 
         ## connect signals
+        self.ui.refreshWidgetPB.clicked.connect( self.refreshWidgets )
+        self.ui.refreshDriverPB.clicked.connect( self.refreshDriver )
+        
         self.ui.stateCB.stateChanged.connect( self._toggleLED )
         
         self.ui.brightnessSlider.valueChanged.connect( self._brightnessChanged )
@@ -64,6 +67,10 @@ class DriverWidget(QtBaseClass):
         self.ui.setToAllLeftPB.clicked.connect( self._setLeftToAll )
         self.ui.setToAllCenterPB.clicked.connect( self._setCenterToAll )
         self.ui.setToAllRightPB.clicked.connect( self._setRightToAll )
+
+    def _initModeCB(self):
+        for item in ClevoMode:
+            self.ui.modeCB.addItem( item.name, item )
 
     def attachDriver(self, driver):
         self.driver = driver
@@ -93,13 +100,19 @@ class DriverWidget(QtBaseClass):
         rightPanelColor = self.driver.getColorRight()
         rightColor = self.toQColor( rightPanelColor )
         self.ui.rightColor.updateWidget( rightColor )
+
+    def refreshDriver(self):
+        enabled = self.ui.stateCB.isChecked()
+        self.driver.setState( enabled )
         
-    @staticmethod
-    def toQColor(driverColor):
-        red = driverColor[0]
-        green = driverColor[1]
-        blue = driverColor[2]
-        return QtGui.QColor( red, green, blue )
+        value = self.ui.brightnessSlider.value()
+        self.driver.setBrightness( value )
+        
+        self._modeChanged()
+        
+        self.ui.leftColor.emitColor()
+        self.ui.centerColor.emitColor()
+        self.ui.rightColor.emitColor()
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
@@ -118,10 +131,6 @@ class DriverWidget(QtBaseClass):
         elif len(valueString) == 2:
             valueString = "0" + valueString
         self.ui.brightnessValue.setText( valueString )
-
-    def _initModeCB(self):
-        for item in ClevoMode:
-            self.ui.modeCB.addItem( item.name, item )
         
     def _modeChanged(self):
         selectedMode = self.ui.modeCB.currentData()
@@ -162,3 +171,9 @@ class DriverWidget(QtBaseClass):
         self.ui.leftColor.setColor(color)
         self.ui.centerColor.setColor(color)
 
+    @staticmethod
+    def toQColor(driverColor):
+        red = driverColor[0]
+        green = driverColor[1]
+        blue = driverColor[2]
+        return QtGui.QColor( red, green, blue )
