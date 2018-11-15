@@ -25,8 +25,9 @@
 import logging
 
 from . import uiloader
+from .qt import pyqtSignal
 from .qt import QtGui
-from ..clevoio import Mode as ClevoMode
+from ..clevoio import Mode as ClevoMode, ClevoDriver
 
 
 
@@ -38,6 +39,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DriverWidget(QtBaseClass):
+    
+    driverChanged   = pyqtSignal( ClevoDriver )
+    
     
     def __init__(self, parentWidget = None):
         super().__init__(parentWidget)
@@ -100,6 +104,8 @@ class DriverWidget(QtBaseClass):
         rightPanelColor = self.driver.getColorRight()
         rightColor = self.toQColor( rightPanelColor )
         self.ui.rightColor.updateWidget( rightColor )
+        
+        self.driverChanged.emit( self.driver )
 
     def refreshDriver(self):
         enabled = self.ui.stateCB.isChecked()
@@ -119,10 +125,12 @@ class DriverWidget(QtBaseClass):
         ## state: 2 -- checked
         enabled = (state != 0)
         self.driver.setState( enabled )
+        self.driverChanged.emit( self.driver )
 
     def _brightnessChanged(self, value: int):
         self.driver.setBrightness( value )
         self._setBrightnessLabel( value )
+        self.driverChanged.emit( self.driver )
 
     def _setBrightnessLabel(self, value: int):
         valueString = str(value)
@@ -135,26 +143,28 @@ class DriverWidget(QtBaseClass):
     def _modeChanged(self):
         selectedMode = self.ui.modeCB.currentData()
         self.driver.setMode( selectedMode )
-        
+        self.driverChanged.emit( self.driver )
         
     def _leftColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorLeft( red, green, blue )
+        self.driverChanged.emit( self.driver )
         
     def _centerColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorCenter( red, green, blue )
+        self.driverChanged.emit( self.driver )
         
     def _rightColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorRight( red, green, blue )
-
+        self.driverChanged.emit( self.driver )
 
     def _setLeftToAll(self):
         color = self.ui.leftColor.getColor()

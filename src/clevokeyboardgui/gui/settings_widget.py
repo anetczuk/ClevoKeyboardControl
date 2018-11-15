@@ -42,3 +42,7 @@ class SettingsWidget(QtBaseClass):
         
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
+
+    def driverChanged(self, driver):
+        _LOGGER.info("xxxxxxxxxxxx")
+    

@@ -62,6 +62,7 @@ class MainWindow(QtBaseClass):
         ##self.ui.appSettings.stateInfoChanged.connect( self.trayIcon.setInfo )
         self.trayIcon.show()
     
+        self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.driverChanged )
 
     def loadSettings(self):
         settings = self.getSettings()
