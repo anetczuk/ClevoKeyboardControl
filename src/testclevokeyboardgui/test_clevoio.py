@@ -21,34 +21,31 @@
 # SOFTWARE.
 #
 
-import logging
 
-from clevokeyboardgui.clevoio import ClevoDriver, FilePath
+import unittest
 
-
-
-_LOGGER = logging.getLogger(__name__)
+from .clevodrivermock import ClevoDriverMock
 
 
 
-class ClevoDriverMock(ClevoDriver):
-    
-    def __init__(self):
-        self.data = dict()
-        self.data[ FilePath.STATE_PATH ]         = 0
-        self.data[ FilePath.BRIGHTNESS_PATH ]    = 0
-        self.data[ FilePath.MODE_PATH ]          = 0
-        self.data[ FilePath.COLOR_LEFT_PATH ]    = "0"
-        self.data[ FilePath.COLOR_CENTER_PATH ]  = "0"
-        self.data[ FilePath.COLOR_RIGHT_PATH ]   = "0"
-
-    def _read(self, fileType: FilePath):
-        _LOGGER.debug("reading mock from file: %s", fileType)
-        retVal = self.data[ fileType ]
-        _LOGGER.debug("returning mock value: %s", retVal)
-        return retVal
-    
-    def _store(self, fileType: FilePath, value: str):
-        _LOGGER.debug("writing to mock file: %s %r",  fileType, value)
-        self.data[ fileType ] = value
+class ClevoDriverTest(unittest.TestCase):
+    def setUp(self):
+        ## Called before testfunction is executed
+        pass
+  
+    def tearDown(self):
+        ## Called after testfunction was executed
+        pass
+       
+    def test_state_valid(self):
+        driver = ClevoDriverMock()
+        driver.setBrightness( 222 )
+        state = driver.readDriverState()
+        
+        driver = ClevoDriverMock()
+        driver.setBrightness( 111 )        
+        driver.setDriverState(state)
+        
+        brightness = driver.getBrightness()
+        self.assertEqual(brightness, 222)
     

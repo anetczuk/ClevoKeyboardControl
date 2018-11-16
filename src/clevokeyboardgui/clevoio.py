@@ -68,13 +68,19 @@ class Panel(Enum):
 
 @unique
 class FilePath(Enum):
-    ROOT_PATH           = auto()
     STATE_PATH          = auto()
     BRIGHTNESS_PATH     = auto()
     MODE_PATH           = auto()
     COLOR_LEFT_PATH     = auto()
     COLOR_CENTER_PATH   = auto()
     COLOR_RIGHT_PATH    = auto()
+
+    @classmethod
+    def findByName(cls, name):
+        for item in cls:
+            if item.name == name:
+                return item
+        return None
 
 
 
@@ -84,7 +90,7 @@ class ClevoDriver():
         pass
     
     def getState(self):
-        value = int( self._read(FilePath.STATE_PATH) )
+        value = int( self.readString(FilePath.STATE_PATH) )
         _LOGGER.debug("got state: %r",  value)
         if value == 0:
             return False
@@ -94,12 +100,12 @@ class ClevoDriver():
     def setState(self, enabled: bool):
         _LOGGER.debug("setting led state: %i",  enabled)
         if enabled == True:
-            self._store( FilePath.STATE_PATH, 1 )
+            self.storeString( FilePath.STATE_PATH, 1 )
         else:
-            self._store( FilePath.STATE_PATH, 0 )
+            self.storeString( FilePath.STATE_PATH, 0 )
     
     def getBrightness(self):
-        value = int( self._read(FilePath.BRIGHTNESS_PATH) )
+        value = int( self.readString(FilePath.BRIGHTNESS_PATH) )
         _LOGGER.debug("got brightness: %r",  value)
         return value   
     
@@ -107,17 +113,17 @@ class ClevoDriver():
         _LOGGER.debug("setting brightness: %i",  value)
         value = max(value, 0)
         value = min(value, 255)
-        self._store( FilePath.BRIGHTNESS_PATH, value )
+        self.storeString( FilePath.BRIGHTNESS_PATH, value )
         
     def getMode(self):
-        value = int( self._read(FilePath.MODE_PATH) )
+        value = int( self.readString(FilePath.MODE_PATH) )
         enumVal = Mode( value )
         _LOGGER.debug("got mode: %r",  enumVal)
         return enumVal   
         
     def setMode(self, mode: Mode):
         _LOGGER.debug("setting mode: %s",  mode)
-        self._store( FilePath.MODE_PATH, mode.value )
+        self.storeString( FilePath.MODE_PATH, mode.value )
     
     def getColorLeft(self):
         return self.getColor(Panel.Left)
@@ -130,7 +136,7 @@ class ClevoDriver():
     
     def getColor(self, panel):
         fileType = self._getPanelFile( panel )
-        hexString = self._read( fileType )
+        hexString = self.readString( fileType )
         value = int(hexString, 16)
         red = (value >> 16) & 255
         green = (value >> 8) & 255
@@ -153,7 +159,7 @@ class ClevoDriver():
         hexValue = hex(colorValue)
         _LOGGER.debug("setting color for %s: %s", panel.name, hexValue)
         file = self._getPanelFile( panel )
-        self._store( file, hexValue )
+        self.storeString( file, hexValue )
     
     def _getPanelFile(self, panel: Panel):
         if panel == Panel.Left:
@@ -165,36 +171,44 @@ class ClevoDriver():
         else:
             raise ValueError("unhandled value: " + str(panel))
         
+    def readDriverState(self):
+        _LOGGER.debug("reading driver's state")
+        ret = dict()
+        for key in FilePath:
+            val = self.readString( key )
+            keyStr = key.name
+            ret[ keyStr ] = val
+        return ret
+    
+    def setDriverState(self, stateDict: dict):
+        _LOGGER.debug("setting driver's state")
+        for key in stateDict:
+            val = stateDict[ key ]
+            keyEnum = FilePath.findByName( key )
+            self.storeString( keyEnum, val )
+    
+    def readString(self, fileType: FilePath):
+        val = self._read( fileType )
+        if fileType == fileType.COLOR_LEFT_PATH:
+            return self._filterColor( val )
+        if fileType == fileType.COLOR_CENTER_PATH:
+            return self._filterColor( val )
+        if fileType == fileType.COLOR_RIGHT_PATH:
+            return self._filterColor( val )
+        return val
+    
+    def _filterColor(self, value: str):
+        if value.startswith("0x") == True:
+            return value
+        return "0x" + value
+    
+    def storeString(self, fileType: FilePath, value: str):
+        self._store( fileType, value )
     
     def _read(self, fileType: FilePath):
-        filePath = self._getFile( fileType )
-        file = None
-        try:
-            file = open( filePath, "r")
-            data = str(file.readline())
-            return data
-        except PermissionError:
-#           sys.exit("needs to be run as root!")
-            _LOGGER.exception("exception occurred")
-            return None
-        finally:
-            if file != None:
-                file.close()
+        raise NotImplementedError('You need to define this method in derived class!')
     
     def _store(self, fileType: FilePath, value: str):
-        filePath = self._getFile( fileType )
-        fd = None
-        try:
-            fd = os.open( filePath, os.O_WRONLY)
-            data = bytes( str(value)+"\n", 'UTF-8')
-            os.write(fd, data )
-        except PermissionError:
-            _LOGGER.exception("exception occurred")
-        finally:
-            if fd != None:
-                os.close(fd)
-                
-    def _getFile(self, fileType: FilePath):
         raise NotImplementedError('You need to define this method in derived class!')
     
     
@@ -211,7 +225,6 @@ class TuxedoDriver( ClevoDriver ):
     COLOR_RIGHT_PATH    = DRIVERFS_PATH + '/color_right'
     
     filePaths = {
-        FilePath.ROOT_PATH:         DRIVERFS_PATH,
         FilePath.STATE_PATH:        STATE_PATH,
         FilePath.BRIGHTNESS_PATH:   BRIGHTNESS_PATH,
         FilePath.MODE_PATH:         MODE_PATH,
@@ -223,6 +236,42 @@ class TuxedoDriver( ClevoDriver ):
     
     def __init__(self):
         super().__init__()
+
+
+    def _read(self, fileType: FilePath):
+        _LOGGER.debug("reading from file: %s", fileType)
+        filePath = self._getFile( fileType )
+        file = None
+        try:
+            file = open( filePath, "r")
+            dataStr = str(file.readline())
+            dataStr = dataStr.rstrip()
+            _LOGGER.debug("returning value: %s", dataStr)
+            return dataStr
+        except PermissionError:
+#           sys.exit("needs to be run as root!")
+            _LOGGER.exception("exception occurred")
+            return None
+        finally:
+            if file != None:
+                file.close()
+    
+    def _store(self, fileType: FilePath, value: str):
+        filePath = self._getFile( fileType )
+        fd = None
+        try:
+            fd = os.open( filePath, os.O_WRONLY)
+            dataStr = str(value)
+            dataStr = dataStr.rstrip()
+            data = bytes( dataStr+"\n", 'UTF-8')
+            os.write(fd, data )
+        except OSError:
+            _LOGGER.exception("unable to store data[%s] for file[%s]", value, fileType)
+        except PermissionError:
+            _LOGGER.exception("exception occurred")
+        finally:
+            if fd != None:
+                os.close(fd)
     
     def _getFile(self, fileType: FilePath):
         return self.filePaths[ fileType ]
