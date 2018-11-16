@@ -63,11 +63,12 @@ class MainWindow(QtBaseClass):
         self.trayIcon.show()
     
         self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.driverChanged )
+        self.ui.settingsWidget.restoreDriver.connect( self.ui.driverWidget.restoreDriver )
 
     def loadSettings(self):
         settings = self.getSettings()
         _LOGGER.debug( "loading app state from %s", settings.fileName() )
-        ##self.ui.appSettings.loadSettings( settings )
+        self.ui.settingsWidget.loadSettings( settings )
         
         ## restore widget state and geometry
         settings.beginGroup( self.objectName() )
@@ -78,42 +79,24 @@ class MainWindow(QtBaseClass):
         if state != None:
             self.restoreState( state );
         settings.endGroup()
-        
-#         ## store geometry of all widgets        
-#         widgets = self.findChildren(QWidget)
-#         for w in widgets:
-#             wKey = getWidgetKey(w)
-#             settings.beginGroup( wKey )
-#             geometry = settings.value("geometry")
-#             if geometry != None:
-#                 w.restoreGeometry( geometry );            
-#             settings.endGroup()
     
     def saveSettings(self):
         settings = self.getSettings()
         _LOGGER.debug( "saving app state to %s", settings.fileName() )
-        ##self.ui.appSettings.saveSettings( settings )
+        self.ui.settingsWidget.saveSettings( settings )
         
         ## store widget state and geometry
         settings.beginGroup( self.objectName() )
         settings.setValue("geometry", self.saveGeometry() );
         settings.setValue("windowState", self.saveState() );
         settings.endGroup()
-
-#         ## store geometry of all widgets        
-#         widgets = self.findChildren(QWidget)
-#         for w in widgets:
-#             wKey = getWidgetKey(w)
-#             settings.beginGroup( wKey )
-#             settings.setValue("geometry", w.saveGeometry() );
-#             settings.endGroup()
         
         ## force save to file
-        settings.sync()        
+        settings.sync()
 
     def getSettings(self):
         ## store in home directory
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "arnet", "ClevoKeyboardGui", self)
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "arnet", "ClevoKeyboardApp", self)
         return settings
         
 

@@ -83,29 +83,42 @@ class DriverWidget(QtBaseClass):
         self.refreshWidgets()
 
     def refreshWidgets(self):
+        self._refreshView()
+        self.driverChanged.emit( self.driver )
+    
+    def _refreshView(self):
+        _LOGGER.debug("refreshing widget")
         ledOn = self.driver.getState()
         self.ui.stateCB.setChecked( ledOn )
         
+        self.ui.brightnessSlider.blockSignals( True )
         brightness = self.driver.getBrightness()
         self.ui.brightnessSlider.setValue( brightness )
         self._setBrightnessLabel( brightness )
+        self.ui.brightnessSlider.blockSignals( False )
         
+        self.ui.modeCB.blockSignals( True )
         mode = self.driver.getMode()
         self.ui.modeCB.setCurrentIndex( mode.value )
+        self.ui.modeCB.blockSignals( False )
         
+        self.ui.leftColor.blockSignals( True )
         leftPanelColor = self.driver.getColorLeft()
         leftColor = self.toQColor( leftPanelColor )
         self.ui.leftColor.updateWidget( leftColor )
-
+        self.ui.leftColor.blockSignals( False )
+        
+        self.ui.centerColor.blockSignals( True )
         centerPanelColor = self.driver.getColorCenter()
         centerColor = self.toQColor( centerPanelColor )
         self.ui.centerColor.updateWidget( centerColor )
-
+        self.ui.centerColor.blockSignals( False )
+        
+        self.ui.rightColor.blockSignals( True )
         rightPanelColor = self.driver.getColorRight()
         rightColor = self.toQColor( rightPanelColor )
         self.ui.rightColor.updateWidget( rightColor )
-        
-        self.driverChanged.emit( self.driver )
+        self.ui.rightColor.blockSignals( False )
 
     def refreshDriver(self):
         enabled = self.ui.stateCB.isChecked()
@@ -119,6 +132,14 @@ class DriverWidget(QtBaseClass):
         self.ui.leftColor.emitColor()
         self.ui.centerColor.emitColor()
         self.ui.rightColor.emitColor()
+
+    def restoreDriver(self, driverState: dict):
+        self.driver.setDriverState( driverState )
+        self._refreshView()
+
+
+    ### ==============================================
+    
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
