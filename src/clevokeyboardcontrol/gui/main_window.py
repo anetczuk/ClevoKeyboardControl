@@ -96,7 +96,7 @@ class MainWindow(QtBaseClass):
 
     def getSettings(self):
         ## store in home directory
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "arnet", "ClevoKeyboardApp", self)
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "arnet", "ClevoKeyboardControl", self)
         return settings
         
 
