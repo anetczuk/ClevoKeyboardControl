@@ -9,8 +9,10 @@ Application allows convenient control of Clevo keyboard LED backlight.
 - restoring led seetings after suspension / hibernation
 
 
-## Screenshots
-TODO: add screenshots
+## Screens
+
+![Keyboard settings](doc/app-screen-device.png "Keyboard settings")
+![Application settings](doc/app-screen-settings.png "Application settings")
 
 
 ## Requirements
@@ -28,6 +30,7 @@ To run application try one of:
 - run *src/clevokbdctl*
 - run *src/clevokeyboardcontrol/main.py* 
 - execute *cd src; python3 -m clevokeyboardcontrol*
+
 Application can be run in profiler mode passing *--profile* as command line parameter. 
 
 
