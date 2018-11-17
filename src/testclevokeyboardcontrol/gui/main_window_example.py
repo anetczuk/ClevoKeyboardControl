@@ -47,7 +47,8 @@ from clevokeyboardcontrol.gui.main_window import MainWindow
 if __name__ != '__main__':
     sys.exit(0)
 
-parser = argparse.ArgumentParser(description='Clevo Keyboard Application')
+parser = argparse.ArgumentParser(description='Clevo Keyboard Control')
+parser.add_argument('--minimized', action='store_const', const=True, default=False, help='Start minimized' )
 parser.add_argument('--profile', action='store_const', const=True, default=False, help='Profile the code' )
 parser.add_argument('--pfile', action='store', default=None, help='Profile the code and output data to file' )
 
@@ -78,7 +79,8 @@ try:
     window = MainWindow(driver)
     window.loadSettings()
     
-    window.show()
+    if args.minimized == False:
+        window.show()
     
     setup_interrupt_handling()
     
