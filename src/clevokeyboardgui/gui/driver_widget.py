@@ -77,10 +77,9 @@ class DriverWidget(QtBaseClass):
             self.ui.modeCB.addItem( item.name, item )
 
     def attachDriver(self, driver):
+        _LOGGER.debug("attaching driver")
         self.driver = driver
-        
-        ## read driver state
-        self.refreshWidgets()
+        self.refreshWidgets()               ## read driver state
 
     def refreshWidgets(self):
         self._refreshView()
@@ -134,6 +133,7 @@ class DriverWidget(QtBaseClass):
         self.ui.rightColor.emitColor()
 
     def restoreDriver(self, driverState: dict):
+        _LOGGER.debug( "restoring driver state" )
         self.driver.setDriverState( driverState )
         self._refreshView()
 

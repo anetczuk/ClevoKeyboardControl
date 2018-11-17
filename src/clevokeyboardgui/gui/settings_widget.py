@@ -26,6 +26,7 @@ import logging
 
 from . import uiloader
 from .qt import pyqtSignal
+from . import suspenddetector
 
 
 
@@ -38,7 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class SettingsWidget(QtBaseClass):
     
-    restoreDriver   = pyqtSignal( dict )
+    restoreDriver = pyqtSignal( dict )
     
     
     def __init__(self, parentWidget = None):
@@ -48,10 +49,27 @@ class SettingsWidget(QtBaseClass):
         
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
+        
+        self.suspendDetector = suspenddetector.QSuspendDetector(self)
+        self.suspendDetector.resumed.connect( self._suspensionRestored )
+        
+        self.ui.restoreSuspendCB.stateChanged.connect( self._toggleResumeSuspend )
 
     def driverChanged(self, driver):
         self.driverState = driver.readDriverState()
         ##_LOGGER.info("driver state: %r", self.driverState)
+    
+    def _suspensionRestored(self):
+        self._emitDriverRestore()
+            
+    def _toggleResumeSuspend(self, state):
+        ## state: 0 -- unchecked
+        ## state: 2 -- checked
+        enabled = (state != 0)
+        if enabled == True:
+            self.suspendDetector.start()
+        else:
+            self.suspendDetector.stop()
     
     
     ## =====================================================
@@ -61,12 +79,14 @@ class SettingsWidget(QtBaseClass):
         self._loadDriverState(settings)
         
         settings.beginGroup( self.objectName() )
-        restoreValue = settings.value("restore", True, type=bool)
-        self.ui.restoreCB.setChecked( restoreValue )
+        restoreStartValue = settings.value("restoreStart", True, type=bool)
+        self.ui.restoreStartCB.setChecked( restoreStartValue )
+        restoreSuspendValue = settings.value("restoreSuspend", True, type=bool)
+        self.ui.restoreSuspendCB.setChecked( restoreSuspendValue )
         settings.endGroup()
         
-        if restoreValue == True and self.driverState != None:
-            self.restoreDriver.emit( self.driverState )
+        if restoreStartValue == True:
+            self._emitDriverRestore()
     
     def _loadDriverState(self, settings):
         state = dict()
@@ -80,14 +100,16 @@ class SettingsWidget(QtBaseClass):
             ## state dictionary is empty
             return
         self.driverState = state
-        _LOGGER.debug( "Loaded driver state: %r", self.driverState )
+        _LOGGER.debug( "loaded driver state: %r", self.driverState )
     
     def saveSettings(self, settings):
         self._saveDriverState(settings)
         
         settings.beginGroup( self.objectName() )
-        restoreValue = self.ui.restoreCB.isChecked()
-        settings.setValue("restore", restoreValue)
+        restoreStartValue = self.ui.restoreStartCB.isChecked()
+        settings.setValue("restoreStart", restoreStartValue)
+        restoreSuspendValue = self.ui.restoreSuspendCB.isChecked()
+        settings.setValue("restoreSuspend", restoreSuspendValue)
         settings.endGroup()
         
     def _saveDriverState(self, settings):
@@ -99,4 +121,9 @@ class SettingsWidget(QtBaseClass):
             val = self.driverState[ key ]
             settings.setValue( key, val)
         settings.endGroup()
+    
+    def _emitDriverRestore(self):
+        if self.driverState == None:
+            return
+        self.restoreDriver.emit( self.driverState )
     

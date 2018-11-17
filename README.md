@@ -6,6 +6,7 @@ Application allows convenient control of Clevo keyboard LED backlight.
 ## Features
 - system tray icon
 - persisting application settings
+- restoring led seetings after suspension / hibernation
 
 
 ## Screenshots
@@ -52,7 +53,9 @@ can be run by *testclevokeyboardgui/gui/main_window_example.py*.
 
 
 ## ToDo
+- handle driver values changed from outside
 - add support for old *clevo-wmi* driver
+- add keyboard sleep option
 
 
 ## References
