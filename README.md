@@ -25,7 +25,7 @@ https://github.com/tuxedocomputers/tuxedo-keyboard
 ## Running application
 
 To run application try one of:
-- run *src/startApp.sh*
+- run *src/clevokbdctl*
 - run *src/clevokeyboardcontrol/main.py* 
 - execute *cd src; python3 -m clevokeyboardcontrol*
 Application can be run in profiler mode passing *--profile* as command line parameter. 
