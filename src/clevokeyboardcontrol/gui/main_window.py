@@ -20,10 +20,10 @@
 import sys
 import logging
 
+from .qt import qApp, QApplication, QIcon, QtCore
 from . import uiloader
 from . import tray_icon
 from . import resources
-from .qt import qApp, QApplication, QIcon, QtCore
 
 
 
@@ -41,24 +41,24 @@ class MainWindow(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
     
-        self.ui.driverWidget.attachDriver( driver )
-        
         self.ui.actionExit.triggered.connect( qApp.quit )
-        
-        imgDir = resources.getImagePath('keyboard-white.png')
-        appIcon = QIcon( imgDir )
-        self.setWindowIcon( appIcon )
         
         self.statusBar().showMessage("Ready")
         
         self.trayIcon = tray_icon.TrayIcon(self)
         self.trayIcon.setToolTip("Clevo Keyboard")
-        ##self.ui.appSettings.showMessage.connect( self.trayIcon.displayMessage )
-        ##self.ui.appSettings.stateInfoChanged.connect( self.trayIcon.setInfo )
-        self.trayIcon.show()
+        
+        self.setIconTheme( tray_icon.TrayIconTheme.WHITE )
     
         self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.driverChanged )
         self.ui.settingsWidget.restoreDriver.connect( self.ui.driverWidget.restoreDriver )
+        
+        self.ui.settingsWidget.iconThemeChanged.connect( self.setIconTheme )
+
+        self.ui.driverWidget.attachDriver( driver )
+        
+        self.trayIcon.show()
+        
 
     def loadSettings(self):
         settings = self.getSettings()
@@ -97,6 +97,16 @@ class MainWindow(QtBaseClass):
 
     # ================================================================
 
+
+    def setIconTheme(self, theme: tray_icon.TrayIconTheme):
+        _LOGGER.debug("setting tray theme: %r", theme)
+        
+        fileName = theme.value
+        iconPath = resources.getImagePath( fileName )
+        appIcon = QIcon( iconPath )
+        
+        self.setWindowIcon( appIcon )
+        self.trayIcon.setIcon( appIcon )
 
     ## slot
     def closeApplication(self):

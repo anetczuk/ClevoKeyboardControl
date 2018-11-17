@@ -22,6 +22,7 @@ import logging
 from . import uiloader
 from .qt import pyqtSignal
 from . import suspenddetector
+from .tray_icon import TrayIconTheme
 
 
 
@@ -34,7 +35,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class SettingsWidget(QtBaseClass):
     
-    restoreDriver = pyqtSignal( dict )
+    restoreDriver       = pyqtSignal( dict )
+    iconThemeChanged    = pyqtSignal( TrayIconTheme )
     
     
     def __init__(self, parentWidget = None):
@@ -49,10 +51,21 @@ class SettingsWidget(QtBaseClass):
         self.suspendDetector.resumed.connect( self._suspensionRestored )
         
         self.ui.restoreSuspendCB.stateChanged.connect( self._toggleResumeSuspend )
+        
+        ## tray combo box
+        self.ui.trayThemeCB.currentIndexChanged.connect( self._trayThemeChanged )
+        for item in TrayIconTheme:
+            itemName = item.name
+            self.ui.trayThemeCB.addItem( itemName, item )
+
 
     def driverChanged(self, driver):
         self.driverState = driver.readDriverState()
         ##_LOGGER.info("driver state: %r", self.driverState)
+
+    
+    ## =====================================================
+
     
     def _suspensionRestored(self):
         self._emitDriverRestore()
@@ -66,6 +79,10 @@ class SettingsWidget(QtBaseClass):
         else:
             self.suspendDetector.stop()
     
+    def _trayThemeChanged(self):
+        selectedTheme = self.ui.trayThemeCB.currentData()
+        self.iconThemeChanged.emit( selectedTheme )
+    
     
     ## =====================================================
     
@@ -78,6 +95,8 @@ class SettingsWidget(QtBaseClass):
         self.ui.restoreStartCB.setChecked( restoreStartValue )
         restoreSuspendValue = settings.value("restoreSuspend", True, type=bool)
         self.ui.restoreSuspendCB.setChecked( restoreSuspendValue )
+        trayTheme = settings.value("trayIcon", None, type=str)
+        self._setCurrentTrayTheme( trayTheme )
         settings.endGroup()
         
         if restoreStartValue == True:
@@ -105,6 +124,8 @@ class SettingsWidget(QtBaseClass):
         settings.setValue("restoreStart", restoreStartValue)
         restoreSuspendValue = self.ui.restoreSuspendCB.isChecked()
         settings.setValue("restoreSuspend", restoreSuspendValue)
+        selectedTheme = self.ui.trayThemeCB.currentData()
+        settings.setValue("trayIcon", selectedTheme.name)
         settings.endGroup()
         
     def _saveDriverState(self, settings):
@@ -116,6 +137,13 @@ class SettingsWidget(QtBaseClass):
             val = self.driverState[ key ]
             settings.setValue( key, val)
         settings.endGroup()
+    
+    def _setCurrentTrayTheme( self, trayTheme: str ):
+        themeIndex = TrayIconTheme.indexOf( trayTheme )
+        if themeIndex < 0:
+            _LOGGER.warn("could not find index for theme: %r", trayTheme)
+            return
+        self.ui.trayThemeCB.setCurrentIndex( themeIndex )
     
     def _emitDriverRestore(self):
         if self.driverState == None:

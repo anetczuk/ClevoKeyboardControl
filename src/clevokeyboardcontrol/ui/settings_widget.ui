@@ -40,6 +40,16 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="trayThemeCB"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="trayThemeText">
+     <property name="text">
+      <string>Tray icon theme:</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

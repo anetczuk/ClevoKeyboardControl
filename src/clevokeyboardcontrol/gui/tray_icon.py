@@ -18,6 +18,7 @@
 
 
 import logging
+from enum import Enum, unique
 
 #from .qt import QtCore
 from .qt import qApp, QSystemTrayIcon, QMenu, QAction
@@ -31,16 +32,33 @@ _LOGGER = logging.getLogger(__name__)
 
 
 
+@unique
+class TrayIconTheme(Enum):
+    WHITE   = 'keyboard-white.png'
+    BLACK   = 'keyboard-black.png'
+
+    @classmethod
+    def findByName(cls, name):
+        for item in cls:
+            if item.name == name:
+                return item
+        return None
+    
+    @classmethod
+    def indexOf(cls, key):
+        index = 0
+        for item in cls:
+            if item == key:
+                return index
+            if item.name == key:
+                return index
+            index = index + 1
+        return -1
+
+
 class TrayIcon(QSystemTrayIcon):
     def __init__(self, parent):
         super().__init__(parent)
-
-        self.neutralIcon = None
-        self.indicatorIcon = None
-        self.currIconState = 0
-
-        iconPath = resources.getImagePath('keyboard-white.png')
-        self.setIcon( QIcon( iconPath ) )
 
         self.activated.connect( self._icon_activated )
 
@@ -68,6 +86,12 @@ class TrayIcon(QSystemTrayIcon):
         
     def setInfo(self, message):
         self.setToolTip("Keyboard: " + message)
+    
+    def setIconTheme(self, theme: TrayIconTheme):
+        _LOGGER.debug("setting tray theme: %r", theme)
+        fileName = theme.value
+        iconPath = resources.getImagePath( fileName )
+        self.setIcon( QIcon( iconPath ) )
     
     def _icon_activated(self, reason):
 #         print("tray clicked, reason:", reason)
