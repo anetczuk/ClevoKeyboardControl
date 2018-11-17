@@ -74,7 +74,7 @@ class DriverWidget(QtBaseClass):
     def attachDriver(self, driver):
         _LOGGER.debug("attaching driver")
         self.driver = driver
-        self.refreshWidgets()               ## read driver state
+        ## self.refreshWidgets()               ## read driver state
 
     def refreshWidgets(self):
         self._refreshView()
@@ -82,8 +82,11 @@ class DriverWidget(QtBaseClass):
     
     def _refreshView(self):
         _LOGGER.debug("refreshing widget")
+        
+        self.ui.stateCB.blockSignals( True )
         ledOn = self.driver.getState()
         self.ui.stateCB.setChecked( ledOn )
+        self.ui.stateCB.blockSignals( True )
         
         self.ui.brightnessSlider.blockSignals( True )
         brightness = self.driver.getBrightness()

@@ -52,6 +52,9 @@ class SettingsWidget(QtBaseClass):
         
         self.ui.restoreSuspendCB.stateChanged.connect( self._toggleResumeSuspend )
         
+        self.ui.restoreStartCB.setChecked( True )
+        self.ui.restoreSuspendCB.setChecked( True )
+        
         ## tray combo box
         self.ui.trayThemeCB.currentIndexChanged.connect( self._trayThemeChanged )
         for item in TrayIconTheme:
@@ -99,8 +102,8 @@ class SettingsWidget(QtBaseClass):
         self._setCurrentTrayTheme( trayTheme )
         settings.endGroup()
         
-        if restoreStartValue == True:
-            self._emitDriverRestore()
+        self._emitDriverRestore( restoreStartValue )
+            
     
     def _loadDriverState(self, settings):
         state = dict()
@@ -145,8 +148,9 @@ class SettingsWidget(QtBaseClass):
             return
         self.ui.trayThemeCB.setCurrentIndex( themeIndex )
     
-    def _emitDriverRestore(self):
-        if self.driverState == None:
-            return
-        self.restoreDriver.emit( self.driverState )
+    def _emitDriverRestore(self, emitState = True):
+        if emitState == True:
+            self.restoreDriver.emit( self.driverState )
+        else:
+            self.restoreDriver.emit( dict() )
     
