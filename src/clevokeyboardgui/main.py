@@ -55,10 +55,10 @@ _LOGGER = logging.getLogger(__name__)
 
 def runApp(args):
     
-    driver = TuxedoDriver()
-    
     ## GUI
     app = QApplication(sys.argv)
+    
+    driver = TuxedoDriver()
                   
     window = MainWindow( driver )
     
@@ -128,7 +128,7 @@ def main():
                 _LOGGER.info( "pyprof2calltree -k -i", profiler_outfile )
              
         timeDiff = (time.time()-starttime)*1000.0
-        _LOGGER.info( "Calculation time: {:13.8f}ms".format(timeDiff) )
+        _LOGGER.info( "Execution time: {:13.8f}ms".format(timeDiff) )
         
         sys.exit(exitCode)
 

@@ -88,6 +88,9 @@ class ClevoDriver():
     
     def __init__(self):
         pass
+
+    def getDriverRootDirectory(self):
+        raise NotImplementedError('You need to define this method in derived class!')
     
     def getState(self):
         value = int( self.readString(FilePath.STATE_PATH) )
@@ -237,6 +240,8 @@ class TuxedoDriver( ClevoDriver ):
     def __init__(self):
         super().__init__()
 
+    def getDriverRootDirectory(self):
+        return self.DRIVERFS_PATH
 
     def _read(self, fileType: FilePath):
         _LOGGER.debug("reading from file: %s", fileType)

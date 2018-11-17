@@ -42,6 +42,9 @@ class ClevoDriverMock(ClevoDriver):
         self.data[ FilePath.COLOR_CENTER_PATH ]  = "0"
         self.data[ FilePath.COLOR_RIGHT_PATH ]   = "0"
 
+    def getDriverRootDirectory(self):
+        return None
+
     def _read(self, fileType: FilePath):
         _LOGGER.debug("reading mock from file: %s", fileType)
         retVal = self.data[ fileType ]
