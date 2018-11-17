@@ -24,43 +24,24 @@
 
 import unittest
 
-import clevokeyboardgui.logger as logger
-
-import logging
-import io
+import clevokeyboardcontrol.gui.uiloader as uiloader
 
 
 
-class LoggerTest(unittest.TestCase):
+class UiLoaderTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed
-        self.logger = logging.Logger(__name__)
-        self.logger.propagate = False
-        self.logger.setLevel( logging.DEBUG )
-        self.buffer = io.StringIO()
-        handler = logging.StreamHandler( self.buffer )
-        formatter = logger.createFormatter()
-        handler.setFormatter( formatter )
-        self.logger.addHandler( handler )
+        pass
   
     def tearDown(self):
         ## Called after testfunction was executed
-        self.logger = None
-        self.buffer.close()
-        self.buffer = None
+        pass
        
-    def test_emptyMessage(self):
-        self.logger.info("")
-        msg = self.buffer.getvalue()
-        self.assertEqual(msg, "\n")
-         
-    def test_newLines_Linux(self):
-        self.logger.info("\n\n\n")
-        msg = self.buffer.getvalue()
-        self.assertEqual(msg, "\n\n\n\n")
+    def test_generateUIFileNameFromClassName_ext(self):
+        ui_file = uiloader.generateUIFileNameFromClassName("aaa.py")
+        self.assertEqual("aaa.ui", ui_file)
         
-    def test_newLines_Windows(self):
-        self.logger.info("\r\n\r\n\r\n")
-        msg = self.buffer.getvalue()
-        self.assertEqual(msg, "\r\n\r\n\r\n\n")
-    
+    def test_generateUIFileNameFromClassName_file(self):
+        ui_file = uiloader.generateUIFileNameFromClassName( __file__ )
+        self.assertEqual("test_uiloader.ui", ui_file)
+

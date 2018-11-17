@@ -236,7 +236,7 @@
   <customwidget>
    <class>ColorWidget</class>
    <extends>QWidget</extends>
-   <header>clevokeyboardgui.gui.color_widget</header>
+   <header>clevokeyboardcontrol.gui.color_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

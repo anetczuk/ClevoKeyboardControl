@@ -26,8 +26,8 @@ https://github.com/tuxedocomputers/tuxedo-keyboard
 
 To run application try one of:
 - run *src/startApp.sh*
-- run *src/clevokeyboardgui/main.py* 
-- execute *cd src; python3 -m clevokeyboardgui*
+- run *src/clevokeyboardcontrol/main.py* 
+- execute *cd src; python3 -m clevokeyboardcontrol*
 Application can be run in profiler mode passing *--profile* as command line parameter. 
 
 
@@ -37,12 +37,12 @@ To run tests execute *src/runtests.py*. It can be run with code profiling
 and code coverage options.
 
 In addition there is demo application not requiring installed drivers. It 
-can be run by *testclevokeyboardgui/gui/main_window_example.py*.
+can be run by *testclevokeyboardcontrol/gui/main_window_example.py*.
 
 
 ## Modules
-- clevokeyboardgui.main -- entry point for the application
-- testclevokeyboardgui -- unit tests for the application
+- clevokeyboardcontrol.main -- entry point for the application
+- testclevokeyboardcontrol -- unit tests for the application
 
 
 ## Examples of use of not obvious Python mechanisms

@@ -35,13 +35,13 @@ sys.path.append(os.path.abspath( os.path.join(os.path.dirname(__file__), "../.."
 import argparse
 import logging
 
-import clevokeyboardgui.logger as logger
+import clevokeyboardcontrol.logger as logger
 
-from testclevokeyboardgui.clevodrivermock import ClevoDriverMock
+from testclevokeyboardcontrol.clevodrivermock import ClevoDriverMock
 
-from clevokeyboardgui.gui.qt import QApplication
-from clevokeyboardgui.gui.sigint import setup_interrupt_handling 
-from clevokeyboardgui.gui.main_window import MainWindow
+from clevokeyboardcontrol.gui.qt import QApplication
+from clevokeyboardcontrol.gui.sigint import setup_interrupt_handling 
+from clevokeyboardcontrol.gui.main_window import MainWindow
 
 
 

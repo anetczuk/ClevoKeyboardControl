@@ -22,26 +22,34 @@
 #
 
 
-import unittest
+import os
 
-import clevokeyboardgui.gui.uiloader as uiloader
+import logging
 
 
+try:
+    from PyQt5 import uic
+except ImportError as e:
+    ### No module named <name>
+    logging.exception("Exception while importing")
+    exit(1)    
 
-class UiLoaderTest(unittest.TestCase):
-    def setUp(self):
-        ## Called before testfunction is executed
-        pass
-  
-    def tearDown(self):
-        ## Called after testfunction was executed
-        pass
-       
-    def test_generateUIFileNameFromClassName_ext(self):
-        ui_file = uiloader.generateUIFileNameFromClassName("aaa.py")
-        self.assertEqual("aaa.ui", ui_file)
-        
-    def test_generateUIFileNameFromClassName_file(self):
-        ui_file = uiloader.generateUIFileNameFromClassName( __file__ )
-        self.assertEqual("test_uiloader.ui", ui_file)
+import clevokeyboardcontrol.defs as defs
+
+
+def generateUIFileNameFromClassName(classFileName):
+    baseName = os.path.basename(classFileName)
+    nameTuple = os.path.splitext(baseName)
+    return nameTuple[0] + ".ui"
+
+def loadUi(uiFilename):
+    try:
+        return uic.loadUiType( os.path.join( defs.ROOT_DIR, "ui", uiFilename ) )
+    except Exception as e:
+        print("Exception while loading UI file:", uiFilename, e)
+        raise
+
+def loadUiFromClassName(uiFilename):
+    ui_file = generateUIFileNameFromClassName(uiFilename)
+    return loadUi( ui_file )
 

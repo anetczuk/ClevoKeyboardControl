@@ -38,13 +38,13 @@ import argparse
 import logging
 import cProfile
 
-import clevokeyboardgui.logger as logger
+import clevokeyboardcontrol.logger as logger
 
-from clevokeyboardgui.clevoio import TuxedoDriver
+from clevokeyboardcontrol.clevoio import TuxedoDriver
 
-from clevokeyboardgui.gui.main_window import MainWindow
-from clevokeyboardgui.gui.qt import QApplication
-from clevokeyboardgui.gui.sigint import setup_interrupt_handling 
+from clevokeyboardcontrol.gui.main_window import MainWindow
+from clevokeyboardcontrol.gui.qt import QApplication
+from clevokeyboardcontrol.gui.sigint import setup_interrupt_handling 
 
 
 

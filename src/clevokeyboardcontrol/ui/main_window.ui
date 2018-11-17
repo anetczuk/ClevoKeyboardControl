@@ -72,13 +72,13 @@
   <customwidget>
    <class>DriverWidget</class>
    <extends>QWidget</extends>
-   <header>clevokeyboardgui.gui.driver_widget</header>
+   <header>clevokeyboardcontrol.gui.driver_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>SettingsWidget</class>
    <extends>QWidget</extends>
-   <header>clevokeyboardgui.gui.settings_widget</header>
+   <header>clevokeyboardcontrol.gui.settings_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

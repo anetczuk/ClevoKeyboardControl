@@ -21,34 +21,37 @@
 # SOFTWARE.
 #
 
+import logging
 
-import sys
-import unittest
-
-from testclevokeyboardgui.clevodrivermock import ClevoDriverMock
-
-from clevokeyboardgui.gui.qt import QApplication
-
-from clevokeyboardgui.gui.main_window import MainWindow as TestWidget
+from clevokeyboardcontrol.clevoio import ClevoDriver, FilePath
 
 
 
-app = QApplication(sys.argv)
+_LOGGER = logging.getLogger(__name__)
 
 
 
-class MainWindowTest(unittest.TestCase):
-    def setUp(self):
-        ## Called before testfunction is executed
-        self.driver = ClevoDriverMock()
-        self.widget = TestWidget( self.driver )
-  
-    def tearDown(self):
-        ## Called after testfunction was executed
-        self.widget = None
-        self.driver = None
-       
-    def test_test(self):
-        self.assertTrue(True)
+class ClevoDriverMock(ClevoDriver):
+    
+    def __init__(self):
+        self.data = dict()
+        self.data[ FilePath.STATE_PATH ]         = 0
+        self.data[ FilePath.BRIGHTNESS_PATH ]    = 0
+        self.data[ FilePath.MODE_PATH ]          = 0
+        self.data[ FilePath.COLOR_LEFT_PATH ]    = "0"
+        self.data[ FilePath.COLOR_CENTER_PATH ]  = "0"
+        self.data[ FilePath.COLOR_RIGHT_PATH ]   = "0"
 
+    def getDriverRootDirectory(self):
+        return None
 
+    def _read(self, fileType: FilePath):
+        _LOGGER.debug("reading mock from file: %s", fileType)
+        retVal = self.data[ fileType ]
+        _LOGGER.debug("returning mock value: %s", retVal)
+        return retVal
+    
+    def _store(self, fileType: FilePath, value: str):
+        _LOGGER.debug("writing to mock file: %s %r",  fileType, value)
+        self.data[ fileType ] = value
+    
