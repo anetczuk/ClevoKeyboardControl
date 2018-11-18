@@ -23,6 +23,7 @@ from . import uiloader
 from .qt import pyqtSignal
 from .qt import QtGui
 from ..clevoio import Mode as ClevoMode, ClevoDriver
+from ..sysfswatchdog import SysFSWatcher
 
 
 
@@ -45,6 +46,7 @@ class DriverWidget(QtBaseClass):
         self.ui.setupUi(self)
         
         self.driver = None
+        self.watcher = None
         
         self._initModeCB()
 
@@ -74,6 +76,14 @@ class DriverWidget(QtBaseClass):
     def attachDriver(self, driver):
         _LOGGER.debug("attaching driver")
         self.driver = driver
+        
+        if self.watcher != None:
+            self.watcher.stop()
+        self.watcher = SysFSWatcher()
+        self.watcher.setCallback( self._sysfsChanged )
+        driverDir = self.driver.getDriverRootDirectory()
+        self.watcher.watch(driverDir, False)
+        
         ## self.refreshWidgets()               ## read driver state
 
     def refreshWidgets(self):
@@ -138,18 +148,26 @@ class DriverWidget(QtBaseClass):
 
     ### ==============================================
     
+    
+    def _sysfsChanged(self):
+        _LOGGER.debug("detected driver external change")
+        self.refreshWidgets()
+        
+    
+    ### ==============================================
+    
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
         ## state: 2 -- checked
         enabled = (state != 0)
         self.driver.setState( enabled )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
 
     def _brightnessChanged(self, value: int):
         self.driver.setBrightness( value )
         self._setBrightnessLabel( value )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
 
     def _setBrightnessLabel(self, value: int):
         valueString = str(value)
@@ -162,28 +180,28 @@ class DriverWidget(QtBaseClass):
     def _modeChanged(self):
         selectedMode = self.ui.modeCB.currentData()
         self.driver.setMode( selectedMode )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
         
     def _leftColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorLeft( red, green, blue )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
         
     def _centerColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorCenter( red, green, blue )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
         
     def _rightColorChanged(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorRight( red, green, blue )
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
 
     def _setLeftToAll(self):
         color = self.ui.leftColor.getColor()
@@ -199,6 +217,10 @@ class DriverWidget(QtBaseClass):
         color = self.ui.rightColor.getColor()
         self.ui.leftColor.setColor(color)
         self.ui.centerColor.setColor(color)
+        
+    def _emitDriverChange(self):
+        ##self.watcher.ignoreNextEvent()
+        self.driverChanged.emit( self.driver )
 
     @staticmethod
     def toQColor(driverColor):

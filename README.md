@@ -1,12 +1,14 @@
 # Clevo Keyboard GUI
 
-Application allows convenient control of Clevo keyboard LED backlight.
+Application allows convenient control of Clevo keyboard LED backlight. In addition it 
+restores lights settings after startup and returning from suspend state.
 
 
 ## Features
 - system tray icon
 - persisting application settings
-- restoring led seetings after suspension / hibernation
+- restoring LED seetings after suspension / hibernation
+- detection of LED settings changed externally
 
 
 ## Screens
@@ -18,6 +20,7 @@ Application allows convenient control of Clevo keyboard LED backlight.
 ## Requirements
 - *Clevo* based device
 - *PyQt5*
+- *watchdog*
 - *tuxedo-keyboard* driver
 
 For more info about installing *tuxedo-keyboard* driver visit:
@@ -56,7 +59,6 @@ can be run by *testclevokeyboardcontrol/gui/main_window_example.py*.
 
 
 ## ToDo
-- handle driver values changed from outside
 - add support for old *clevo-wmi* driver
 - add keyboard sleep option
 
