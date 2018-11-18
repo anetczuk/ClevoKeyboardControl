@@ -21,7 +21,7 @@ import logging
 
 from . import uiloader
 from .qt import pyqtSignal
-from .qt import QtGui
+from .qt import QtCore, QtGui
 from ..clevoio import Mode as ClevoMode, ClevoDriver
 from ..sysfswatchdog import SysFSWatcher
 
@@ -134,11 +134,19 @@ class DriverWidget(QtBaseClass):
         value = self.ui.brightnessSlider.value()
         self.driver.setBrightness( value )
         
-        self._modeChanged()
+        selectedMode = self.ui.modeCB.currentData()
+        self.driver.setMode( selectedMode )
         
-        self.ui.leftColor.emitColor()
-        self.ui.centerColor.emitColor()
-        self.ui.rightColor.emitColor()
+        leftColor = self.ui.leftColor.getColor()
+        self.driver.setColorLeft( leftColor.red(), leftColor.green(), leftColor.blue() )
+
+        centerColor = self.ui.centerColor.getColor()
+        self.driver.setColorCenter( centerColor.red(), centerColor.green(), centerColor.blue() )
+        
+        rightColor = self.ui.rightColor.getColor()
+        self.driver.setColorRight( rightColor.red(), rightColor.green(), rightColor.blue() )
+        
+        self._emitDriverChange()
 
     def restoreDriver(self, driverState: dict):
         _LOGGER.debug( "restoring driver state" )
@@ -150,8 +158,8 @@ class DriverWidget(QtBaseClass):
     
     
     def _sysfsChanged(self):
-        _LOGGER.debug("detected driver external change")
-        self.refreshWidgets()
+        ## call method from Qt's thread instead of watchdog's thread
+        QtCore.QTimer.singleShot(0, self.refreshWidgets)
         
     
     ### ==============================================

@@ -75,11 +75,16 @@ class Handler(FileSystemEventHandler):
         ##_LOGGER.info( "Directory content modified - %s, %r", event.src_path, event )
         
         if self.ignoreNextEvent == True:
+            _LOGGER.debug("detected driver external change -- ignored")
             self.ignoreNextEvent = False
             return
         
-        if self.callback != None:
-            self.callback()
+        if self.callback == None:
+            _LOGGER.debug("detected driver external change -- no callback")
+            return
+        
+        _LOGGER.debug("detected driver external change")
+        self.callback()
 
 
 class FileContentObserver(polling.PollingObserverVFS):
