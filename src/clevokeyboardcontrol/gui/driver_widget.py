@@ -86,7 +86,7 @@ class DriverWidget(QtBaseClass):
         self.ui.stateCB.blockSignals( True )
         ledOn = self.driver.getState()
         self.ui.stateCB.setChecked( ledOn )
-        self.ui.stateCB.blockSignals( True )
+        self.ui.stateCB.blockSignals( False )
         
         self.ui.brightnessSlider.blockSignals( True )
         brightness = self.driver.getBrightness()
