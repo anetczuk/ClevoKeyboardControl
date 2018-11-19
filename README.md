@@ -27,6 +27,13 @@ For more info about installing *tuxedo-keyboard* driver visit:
 https://github.com/tuxedocomputers/tuxedo-keyboard
 
 
+## Permissions
+
+Application requires that user have permission to write to driver's sysfs files.
+To do so run *configure_udev.sh* to add udev rule permitting *clevo-keyboard* group to modify the files.
+Then add Your user to the group. It might require rebooting the system.
+
+
 ## Running application
 
 To run application try one of:
@@ -44,6 +51,12 @@ and code coverage options.
 
 In addition there is demo application not requiring installed drivers. It 
 can be run by *testclevokeyboardcontrol/gui/main_window_example.py*.
+
+
+## Autostrart
+
+You can easily add application to autostart by running *configure_autostart.sh*. 
+No special proviledges required.
 
 
 ## Modules
