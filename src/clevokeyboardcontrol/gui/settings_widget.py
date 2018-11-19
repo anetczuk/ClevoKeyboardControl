@@ -94,12 +94,16 @@ class SettingsWidget(QtBaseClass):
         self._loadDriverState(settings)
         
         settings.beginGroup( self.objectName() )
+        
         restoreStartValue = settings.value("restoreStart", True, type=bool)
         self.ui.restoreStartCB.setChecked( restoreStartValue )
+        
         restoreSuspendValue = settings.value("restoreSuspend", True, type=bool)
         self.ui.restoreSuspendCB.setChecked( restoreSuspendValue )
+        
         trayTheme = settings.value("trayIcon", None, type=str)
         self._setCurrentTrayTheme( trayTheme )
+        
         settings.endGroup()
         
         self._emitDriverRestore( restoreStartValue )
@@ -123,12 +127,16 @@ class SettingsWidget(QtBaseClass):
         self._saveDriverState(settings)
         
         settings.beginGroup( self.objectName() )
+        
         restoreStartValue = self.ui.restoreStartCB.isChecked()
         settings.setValue("restoreStart", restoreStartValue)
+        
         restoreSuspendValue = self.ui.restoreSuspendCB.isChecked()
         settings.setValue("restoreSuspend", restoreSuspendValue)
+        
         selectedTheme = self.ui.trayThemeCB.currentData()
         settings.setValue("trayIcon", selectedTheme.name)
+        
         settings.endGroup()
         
     def _saveDriverState(self, settings):

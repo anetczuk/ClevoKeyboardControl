@@ -20,7 +20,6 @@
 import logging
 from enum import Enum, unique
 
-#from .qt import QtCore
 from .qt import qApp, QSystemTrayIcon, QMenu, QAction
 from .qt import QIcon
 
