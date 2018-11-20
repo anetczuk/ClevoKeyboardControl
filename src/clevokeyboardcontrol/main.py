@@ -52,6 +52,9 @@ def runApp(args):
     
     ## GUI
     app = QApplication(sys.argv)
+    app.setApplicationName("ClevoKeyboardControl")
+    app.setOrganizationName("arnet")
+    ### app.setOrganizationDomain("www.my-org.com")
     
     driver = TuxedoDriver()
                   

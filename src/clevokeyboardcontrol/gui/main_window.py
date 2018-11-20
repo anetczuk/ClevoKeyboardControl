@@ -16,11 +16,9 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-
-import sys
 import logging
 
-from .qt import qApp, QApplication, QIcon, QtCore
+from .qt import qApp, QIcon, QtCore
 from . import uiloader
 from . import tray_icon
 from . import resources
@@ -91,7 +89,9 @@ class MainWindow(QtBaseClass):
 
     def getSettings(self):
         ## store in home directory
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "arnet", "ClevoKeyboardControl", self)
+        orgName = qApp.organizationName()
+        appName = qApp.applicationName()
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, orgName, appName, self)
         return settings
         
 
@@ -139,11 +139,4 @@ def getWidgetKey(widget):
         retKey = widget.objectName() + "-"+ retKey
         widget = widget.parent()
     return retKey
-
-def execApp():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    
-    window.show()
-    sys.exit(app.exec_())
 

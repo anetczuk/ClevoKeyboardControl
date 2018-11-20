@@ -75,6 +75,9 @@ try:
     driver = ClevoDriverMock()
     
     app = QApplication(sys.argv)
+    app.setApplicationName("ClevoKeyboardControl")
+    app.setOrganizationName("arnet")
+    ### app.setOrganizationDomain("www.my-org.com")
     
     window = MainWindow(driver)
     window.loadSettings()
