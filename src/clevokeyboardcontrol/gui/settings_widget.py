@@ -25,12 +25,10 @@ from . import suspenddetector
 from .tray_icon import TrayIconTheme
 
 
-
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class SettingsWidget(QtBaseClass):
@@ -38,8 +36,7 @@ class SettingsWidget(QtBaseClass):
     restoreDriver       = pyqtSignal( dict )
     iconThemeChanged    = pyqtSignal( TrayIconTheme )
 
-
-    def __init__(self, parentWidget = None):
+    def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
 
         self.driverState = None
@@ -61,14 +58,11 @@ class SettingsWidget(QtBaseClass):
             itemName = item.name
             self.ui.trayThemeCB.addItem( itemName, item )
 
-
     def driverChanged(self, driver):
         self.driverState = driver.readDriverState()
         ##_LOGGER.info("driver state: %r", self.driverState)
 
-
     ## =====================================================
-
 
     def _suspensionRestored(self):
         self._emitDriverRestore()
@@ -77,7 +71,7 @@ class SettingsWidget(QtBaseClass):
         ## state: 0 -- unchecked
         ## state: 2 -- checked
         enabled = (state != 0)
-        if enabled == True:
+        if enabled is True:
             self.suspendDetector.start()
         else:
             self.suspendDetector.stop()
@@ -86,9 +80,7 @@ class SettingsWidget(QtBaseClass):
         selectedTheme = self.ui.trayThemeCB.currentData()
         self.iconThemeChanged.emit( selectedTheme )
 
-
     ## =====================================================
-
 
     def loadSettings(self, settings):
         self._loadDriverState(settings)
@@ -108,7 +100,6 @@ class SettingsWidget(QtBaseClass):
 
         self._emitDriverRestore( restoreStartValue )
 
-
     def _loadDriverState(self, settings):
         state = dict()
         settings.beginGroup( "DriverState" )
@@ -117,7 +108,7 @@ class SettingsWidget(QtBaseClass):
             if len(value) > 0:
                 state[ key ] = value
         settings.endGroup()
-        if bool(state) == False:
+        if bool(state) is False:
             ## state dictionary is empty
             return
         self.driverState = state
@@ -141,7 +132,7 @@ class SettingsWidget(QtBaseClass):
 
     def _saveDriverState(self, settings):
         _LOGGER.debug( "Saving driver state: %r", self.driverState )
-        if self.driverState == None:
+        if self.driverState is None:
             return
         settings.beginGroup( "DriverState" )
         for key in self.driverState:
@@ -156,8 +147,8 @@ class SettingsWidget(QtBaseClass):
             return
         self.ui.trayThemeCB.setCurrentIndex( themeIndex )
 
-    def _emitDriverRestore(self, emitState = True):
-        if emitState == True:
+    def _emitDriverRestore(self, emitState=True):
+        if emitState is True:
             self.restoreDriver.emit( self.driverState )
         else:
             self.restoreDriver.emit( dict() )

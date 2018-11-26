@@ -22,9 +22,7 @@ import logging
 from clevokeyboardcontrol.clevoio import ClevoDriver, FilePath
 
 
-
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class ClevoDriverMock(ClevoDriver):
@@ -48,5 +46,5 @@ class ClevoDriverMock(ClevoDriver):
         return retVal
 
     def _store(self, fileType: FilePath, value: str):
-        _LOGGER.debug("writing to mock file: %s %r",  fileType, value)
+        _LOGGER.debug("writing to mock file: %s %r", fileType, value)
         self.data[ fileType ] = value

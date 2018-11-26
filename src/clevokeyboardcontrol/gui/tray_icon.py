@@ -26,9 +26,7 @@ from .qt import QIcon
 from . import resources
 
 
-
 _LOGGER = logging.getLogger(__name__)
-
 
 
 @unique

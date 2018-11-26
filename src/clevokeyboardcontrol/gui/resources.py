@@ -20,14 +20,14 @@
 import os
 
 
-
 def getImagePath(imageName):
     imgDir = getImagesPath()
     path = imgDir + os.path.sep + imageName
     return path
 
+
 def getImagesPath():
     scriptDir = os.path.dirname(os.path.realpath(__file__))
-    imgDir = scriptDir + os.path.sep +'img'
+    imgDir = scriptDir + os.path.sep + 'img'
     return imgDir
 

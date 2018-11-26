@@ -26,7 +26,7 @@ try:
     from PyQt5 import QtGui
     from PyQt5.QtGui import QIcon
 
-except ImportError as e:
+except ImportError:
     ### No module named <name>
     logging.exception("Exception while importing")
     exit(1)
@@ -38,8 +38,8 @@ except ImportError as e:
 def clearLayout(layout):
     for i in reversed(range(layout.count())):
         item = layout.takeAt( i )
-        if item.widget() != None:
+        if item.widget() is not None:
             item.widget().deleteLater()
-        if item.layout() != None:
+        if item.layout() is not None:
             clearLayout( item.layout() )
 

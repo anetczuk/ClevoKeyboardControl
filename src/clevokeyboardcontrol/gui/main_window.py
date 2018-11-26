@@ -24,12 +24,10 @@ from . import tray_icon
 from . import resources
 
 
-
 _LOGGER = logging.getLogger(__name__)
 
 
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
-
 
 
 class MainWindow(QtBaseClass):
@@ -57,7 +55,6 @@ class MainWindow(QtBaseClass):
 
         self.trayIcon.show()
 
-
     def loadSettings(self):
         settings = self.getSettings()
         _LOGGER.debug( "loading app state from %s", settings.fileName() )
@@ -67,10 +64,10 @@ class MainWindow(QtBaseClass):
         settings.beginGroup( self.objectName() )
         geometry = settings.value("geometry")
         state = settings.value("windowState")
-        if geometry != None:
-            self.restoreGeometry( geometry );
-        if state != None:
-            self.restoreState( state );
+        if geometry is not None:
+            self.restoreGeometry( geometry )
+        if state is not None:
+            self.restoreState( state )
         settings.endGroup()
 
     def saveSettings(self):
@@ -80,8 +77,8 @@ class MainWindow(QtBaseClass):
 
         ## store widget state and geometry
         settings.beginGroup( self.objectName() )
-        settings.setValue("geometry", self.saveGeometry() );
-        settings.setValue("windowState", self.saveState() );
+        settings.setValue("geometry", self.saveGeometry() )
+        settings.setValue("windowState", self.saveState() )
         settings.endGroup()
 
         ## force save to file
@@ -94,9 +91,7 @@ class MainWindow(QtBaseClass):
         settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, orgName, appName, self)
         return settings
 
-
     # ================================================================
-
 
     def setIconTheme(self, theme: tray_icon.TrayIconTheme):
         _LOGGER.debug("setting tray theme: %r", theme)
@@ -113,9 +108,7 @@ class MainWindow(QtBaseClass):
         ##self.close()
         qApp.quit()
 
-
     # =======================================
-
 
     # Override closeEvent, to intercept the window closing event
     def closeEvent(self, event):
@@ -131,12 +124,12 @@ class MainWindow(QtBaseClass):
 
 
 def getWidgetKey(widget):
-    if widget == None:
+    if widget is None:
         return None
     retKey = widget.objectName()
     widget = widget.parent()
-    while widget != None:
-        retKey = widget.objectName() + "-"+ retKey
+    while widget is not None:
+        retKey = widget.objectName() + "-" + retKey
         widget = widget.parent()
     return retKey
 

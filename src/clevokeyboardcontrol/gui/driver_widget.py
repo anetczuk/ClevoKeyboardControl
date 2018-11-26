@@ -26,20 +26,17 @@ from ..clevoio import Mode as ClevoMode, ClevoDriver
 from ..sysfswatchdog import SysFSWatcher
 
 
-
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-
 class DriverWidget(QtBaseClass):
 
-    driverChanged   = pyqtSignal( ClevoDriver )
+    driverChanged = pyqtSignal( ClevoDriver )
 
-
-    def __init__(self, parentWidget = None):
+    def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
 
         self.ui = UiTargetClass()
@@ -77,7 +74,7 @@ class DriverWidget(QtBaseClass):
         _LOGGER.debug("attaching driver")
         self.driver = driver
 
-        if self.watcher != None:
+        if self.watcher is not None:
             self.watcher.stop()
         self.watcher = SysFSWatcher()
         self.watcher.setCallback( self._sysfsChanged )
@@ -153,17 +150,13 @@ class DriverWidget(QtBaseClass):
         self.driver.setDriverState( driverState )
         self._refreshView()
 
-
     ### ==============================================
-
 
     def _sysfsChanged(self):
         ## call method from Qt's thread instead of watchdog's thread
         QtCore.QTimer.singleShot(0, self.refreshWidgets)
 
-
     ### ==============================================
-
 
     def _toggleLED(self, state):
         ## state: 0 -- unchecked

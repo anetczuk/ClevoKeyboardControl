@@ -24,15 +24,12 @@ from .qt import QtCore
 from .qt import pyqtSignal
 
 
-
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class QSuspendDetector( QtCore.QObject ):
 
     resumed   = pyqtSignal()
-
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -43,14 +40,14 @@ class QSuspendDetector( QtCore.QObject ):
     def start(self):
         _LOGGER.debug("starting suspension detector")
         self.lastTime = None
-        self.timer.start( 1000 );                            ## triggered every second
+        self.timer.start( 1000 )                            ## triggered every second
 
     def stop(self):
         _LOGGER.debug("stopping suspension detector")
         self.timer.stop()
 
     def _suspend_check(self):
-        if self.lastTime == None:
+        if self.lastTime is None:
             self.lastTime = datetime.datetime.now()
             return
         currTime = datetime.datetime.now()

@@ -22,7 +22,6 @@ import unittest
 from .clevodrivermock import ClevoDriverMock
 
 
-
 class ClevoDriverTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed

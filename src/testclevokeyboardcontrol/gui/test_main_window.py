@@ -27,9 +27,7 @@ from clevokeyboardcontrol.gui.qt import QApplication
 from clevokeyboardcontrol.gui.main_window import MainWindow as TestWidget
 
 
-
 app = QApplication(sys.argv)
-
 
 
 class MainWindowTest(unittest.TestCase):

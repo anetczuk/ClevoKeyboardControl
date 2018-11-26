@@ -50,10 +50,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-
     coverageData = None
     ## start code coverage
-    if args.coverage == True:
+    if args.coverage is True:
         try:
             import coverage
         except ImportError:
@@ -67,12 +66,10 @@ if __name__ == '__main__':
         ##coverageData.load()
         coverageData.start()
 
-
     if len(args.runtest) > 0:
         suite = unittest.TestLoader().loadTestsFromName( args.runtest )
     else:
         suite = unittest.TestLoader().discover( script_dir )
-
 
     testsRepeats = int(args.repeat)
 
@@ -81,58 +78,58 @@ if __name__ == '__main__':
     try:
         ## start code profiler
         profiler_outfile = args.pfile
-        if args.profile == True or profiler_outfile != None:
+        if args.profile is True or profiler_outfile is not None:
             print( "Starting profiler" )
             profiler = cProfile.Profile()
             profiler.enable()
 
         ## run proper tests
-        if args.untilfailure == True:
+        if args.untilfailure is True:
             counter = 1
             while True:
                 print( "Tests iteration:", counter )
                 counter += 1
                 testResult = unittest.TextTestRunner().run(suite)
-                if testResult.wasSuccessful() == False:
-                    break;
+                if testResult.wasSuccessful() is False:
+                    break
                 print( "\n" )
         elif testsRepeats > 0:
-            for counter in range(1, testsRepeats+1):
+            for counter in range(1, testsRepeats + 1):
                 print( "Tests iteration:", counter )
                 testResult = unittest.TextTestRunner().run(suite)
-                if testResult.wasSuccessful() == False:
-                    break;
+                if testResult.wasSuccessful() is False:
+                    break
                 print( "\n" )
         else:
             unittest.TextTestRunner().run(suite)
 
     finally:
         ## stop profiler
-        if profiler != None:
+        if profiler is not None:
             profiler.disable()
-            if profiler_outfile == None:
+            if profiler_outfile is None:
                 print( "Generating profiler data" )
                 profiler.print_stats(1)
             else:
                 print( "Storing profiler data to", profiler_outfile )
                 profiler.dump_stats( profiler_outfile )
 
-            if profiler_outfile != None:
+            if profiler_outfile is not None:
                 ##pyprof2calltree -i $PROF_FILE -k
                 print( "Launching: pyprof2calltree -i {} -k".format(profiler_outfile) )
                 subprocess.call(["pyprof2calltree", "-i", profiler_outfile, "-k"])
 
         ## prepare coverage results
-        if coverageData != None:
+        if coverageData is not None:
             ## convert results to html
-            tmprootdir=tempfile.gettempdir()
-            revCrcTmpDir=tmprootdir+"/revcrc"
+            tmprootdir = tempfile.gettempdir()
+            revCrcTmpDir = tmprootdir + "/revcrc"
             if not os.path.exists(revCrcTmpDir):
                 os.makedirs(revCrcTmpDir)
-            htmlcovdir=revCrcTmpDir+"/htmlcov"
+            htmlcovdir = revCrcTmpDir + "/htmlcov"
 
             coverageData.stop()
             coverageData.save()
             coverageData.html_report(directory=htmlcovdir)
-            print( "\nCoverage HTML output:", (htmlcovdir+"/index.html") )
+            print( "\nCoverage HTML output:", (htmlcovdir + "/index.html") )
 

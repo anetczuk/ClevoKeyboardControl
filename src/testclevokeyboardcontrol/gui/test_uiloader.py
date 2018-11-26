@@ -22,7 +22,6 @@ import unittest
 import clevokeyboardcontrol.gui.uiloader as uiloader
 
 
-
 class UiLoaderTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed

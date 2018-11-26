@@ -39,9 +39,7 @@ from clevokeyboardcontrol.gui.sigint import setup_interrupt_handling
 from clevokeyboardcontrol.gui.main_window import MainWindow
 
 
-
 ## ============================= main section ===================================
-
 
 
 if __name__ != '__main__':
@@ -82,7 +80,7 @@ try:
     window = MainWindow(driver)
     window.loadSettings()
 
-    if args.minimized == False:
+    if args.minimized is False:
         window.show()
 
     setup_interrupt_handling()
@@ -94,7 +92,7 @@ try:
 
     _LOGGER.info("Done with exit code: %s", exitCode)
 
-except:
+except BaseException:
     exitCode = 1
     _LOGGER.exception("Exception occured")
     raise

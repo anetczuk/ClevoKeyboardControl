@@ -25,20 +25,17 @@ from .qt import pyqtSignal
 from .qt import QtWidgets, QtGui
 
 
-
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-
 class ColorWidget(QtBaseClass):
 
-    colorChanged   = pyqtSignal( QtGui.QColor )      ## passes RGB value
+    colorChanged = pyqtSignal( QtGui.QColor )      ## passes RGB value
 
-
-    def __init__(self, parentWidget = None):
+    def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
 
         self.ui = UiTargetClass()
@@ -72,7 +69,7 @@ class ColorWidget(QtBaseClass):
 
     def _pickColor(self):
         color = QtWidgets.QColorDialog.getColor()
-        if color.isValid() == False:
+        if color.isValid() is False:
             _LOGGER.info("picked color is invalid")
             return
         self.setColor( color )
@@ -89,8 +86,8 @@ class ColorWidget(QtBaseClass):
         self.blockSignals( False )
 
     def _updatePreviewColor(self, color):
-        pal = self.ui.colorPreview.palette();
-        pal.setColor(QtGui.QPalette.Background, color);
-        self.ui.colorPreview.setAutoFillBackground(True);
-        self.ui.colorPreview.setPalette(pal);
+        pal = self.ui.colorPreview.palette()
+        pal.setColor(QtGui.QPalette.Background, color)
+        self.ui.colorPreview.setAutoFillBackground(True)
+        self.ui.colorPreview.setPalette(pal)
 

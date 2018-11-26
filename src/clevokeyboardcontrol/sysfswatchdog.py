@@ -27,9 +27,7 @@ from watchdog.observers import polling
 from watchdog.events import FileSystemEventHandler
 
 
-
 _LOGGER = logging.getLogger(__name__)
-
 
 
 class SysFSWatcher:
@@ -50,7 +48,7 @@ class SysFSWatcher:
         self.event_handler.ignoreNextEvent = True
 
     def watch(self, directoryPath, recursiveMode: bool):
-        if directoryPath == None:
+        if directoryPath is None:
             return
         self.observer.schedule(self.event_handler, directoryPath, recursive=recursiveMode)
         self.observer.start()
@@ -62,7 +60,7 @@ class SysFSWatcher:
         try:
             while True:
                 time.sleep(5)
-        except:
+        except BaseException:
             self.observer.stop()
             _LOGGER.error("Error")
 
@@ -79,12 +77,12 @@ class Handler(FileSystemEventHandler):
     def on_any_event(self, event):
         ##_LOGGER.info( "Directory content modified - %s, %r", event.src_path, event )
 
-        if self.ignoreNextEvent == True:
+        if self.ignoreNextEvent is True:
             _LOGGER.debug("detected driver external change -- ignored")
             self.ignoreNextEvent = False
             return
 
-        if self.callback == None:
+        if self.callback is None:
             _LOGGER.debug("detected driver external change -- no callback")
             return
 
@@ -132,13 +130,12 @@ class StatResult():
         Watchdog does not support checking for file content, so workaround is
         to incorporate information about content (hash) into 'mtime' field.
         """
-        if self.mtimeField == None:
+        if self.mtimeField is None:
             hashValue = self.calculateHash()
             ## st_mtime allows to detect case, when file was modified with the same content
             self.mtimeField = str(self.osResult.st_mtime) + "_" + str(self.osResult.st_size) + "_" + hashValue
             ##_LOGGER.debug("calculated field %r", self.mtimeField)
         return self.mtimeField
-
 
     def calculateHash(self):
         hasher = hashlib.md5()

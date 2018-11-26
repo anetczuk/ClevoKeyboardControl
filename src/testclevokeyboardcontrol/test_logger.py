@@ -25,7 +25,6 @@ import logging
 import io
 
 
-
 class LoggerTest(unittest.TestCase):
     def setUp(self):
         ## Called before testfunction is executed

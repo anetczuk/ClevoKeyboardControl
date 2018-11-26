@@ -23,9 +23,7 @@ import logging
 from enum import Enum, unique, auto
 
 
-
 _LOGGER = logging.getLogger(__name__)
-
 
 
 @unique
@@ -41,7 +39,6 @@ class Mode(Enum):
     RandomColor = 5
     Tempo       = 6
     Wave        = 7
-
 
     def __str__(self):
         return "%s.%s[%s]" % (self.__class__.__name__, self.name, self.value )
@@ -78,7 +75,6 @@ class FilePath(Enum):
         return None
 
 
-
 class ClevoDriver():
 
     def __init__(self):
@@ -97,7 +93,7 @@ class ClevoDriver():
 
     def setState(self, enabled: bool):
         _LOGGER.debug("setting led state: %i",  enabled)
-        if enabled == True:
+        if enabled is True:
             self.storeString( FilePath.STATE_PATH, 1 )
         else:
             self.storeString( FilePath.STATE_PATH, 0 )
@@ -196,7 +192,7 @@ class ClevoDriver():
         return val
 
     def _filterColor(self, value: str):
-        if value.startswith("0x") == True:
+        if value.startswith("0x") is True:
             return value
         return "0x" + value
 
@@ -208,7 +204,6 @@ class ClevoDriver():
 
     def _store(self, fileType: FilePath, value: str):
         raise NotImplementedError('You need to define this method in derived class!')
-
 
 
 class TuxedoDriver( ClevoDriver ):
@@ -231,7 +226,6 @@ class TuxedoDriver( ClevoDriver ):
         FilePath.COLOR_RIGHT_PATH:  COLOR_RIGHT_PATH
     }
 
-
     def __init__(self):
         super().__init__()
 
@@ -253,7 +247,7 @@ class TuxedoDriver( ClevoDriver ):
             _LOGGER.exception("exception occurred")
             return None
         finally:
-            if file != None:
+            if file is not None:
                 file.close()
 
     def _store(self, fileType: FilePath, value: str):
@@ -263,14 +257,14 @@ class TuxedoDriver( ClevoDriver ):
             fd = os.open( filePath, os.O_WRONLY)
             dataStr = str(value)
             dataStr = dataStr.rstrip()
-            data = bytes( dataStr+"\n", 'UTF-8')
+            data = bytes( dataStr + "\n", 'UTF-8' )
             os.write(fd, data )
         except OSError:
             _LOGGER.exception("unable to store data[%s] for file[%s]", value, fileType)
         except PermissionError:
             _LOGGER.exception("exception occurred")
         finally:
-            if fd != None:
+            if fd is not None:
                 os.close(fd)
 
     def _getFile(self, fileType: FilePath):

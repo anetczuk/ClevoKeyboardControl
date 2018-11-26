@@ -24,7 +24,7 @@ import logging
 
 try:
     from PyQt5 import uic
-except ImportError as e:
+except ImportError:
     ### No module named <name>
     logging.exception("Exception while importing")
     exit(1)
@@ -37,12 +37,14 @@ def generateUIFileNameFromClassName(classFileName):
     nameTuple = os.path.splitext(baseName)
     return nameTuple[0] + ".ui"
 
+
 def loadUi(uiFilename):
     try:
         return uic.loadUiType( os.path.join( defs.ROOT_DIR, "ui", uiFilename ) )
     except Exception as e:
         print("Exception while loading UI file:", uiFilename, e)
         raise
+
 
 def loadUiFromClassName(uiFilename):
     ui_file = generateUIFileNameFromClassName(uiFilename)

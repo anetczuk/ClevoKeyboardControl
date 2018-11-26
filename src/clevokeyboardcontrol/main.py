@@ -42,10 +42,8 @@ from clevokeyboardcontrol.gui.qt import QApplication
 from clevokeyboardcontrol.gui.sigint import setup_interrupt_handling
 
 
-
 logger.configure()
 _LOGGER = logging.getLogger(__name__)
-
 
 
 def runApp(args):
@@ -62,7 +60,7 @@ def runApp(args):
 
     window.loadSettings()
 
-    if args.minimized == False:
+    if args.minimized is False:
         window.show()
 
     setup_interrupt_handling()
@@ -81,45 +79,37 @@ def main():
     parser.add_argument('--profile', action='store_const', const=True, default=False, help='Profile the code' )
     parser.add_argument('--pfile', action='store', default=None, help='Profile the code and output data to file' )
 
-
     args = parser.parse_args()
-
 
     _LOGGER.debug("\n\n")
     _LOGGER.debug("Starting the application")
-
     _LOGGER.debug("Logger log file: %s" % logger.log_file)
-
-
 
     starttime = time.time()
     profiler = None
 
     exitCode = 0
 
-
     try:
 
         profiler_outfile = args.pfile
-        if args.profile == True or profiler_outfile != None:
+        if args.profile is True or profiler_outfile is not None:
             print( "Starting profiler" )
             profiler = cProfile.Profile()
             profiler.enable()
 
-
         exitCode = runApp(args)
 
-
-    except:
+    except BaseException:
         exitCode = 1
         _LOGGER.exception("Exception occured")
         raise
 
     finally:
         _LOGGER.info( "" )                    ## print new line
-        if profiler != None:
+        if profiler is not None:
             profiler.disable()
-            if profiler_outfile == None:
+            if profiler_outfile is None:
                 _LOGGER.info( "Generating profiler data" )
                 profiler.print_stats(1)
             else:
@@ -127,7 +117,7 @@ def main():
                 profiler.dump_stats( profiler_outfile )
                 _LOGGER.info( "pyprof2calltree -k -i", profiler_outfile )
 
-        timeDiff = (time.time()-starttime)*1000.0
+        timeDiff = (time.time() - starttime) * 1000.0
         _LOGGER.info( "Execution time: {:13.8f}ms".format(timeDiff) )
 
         sys.exit(exitCode)
