@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 #
 #     ClevoKeyboardControl. Control of keyboard backlights.
-# 
+#
 #     Copyright (C) 2018  Arkadiusz Netczuk <dev.arnet@gmail.com>
-# 
+#
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
-# 
+#
 #     This program is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
@@ -39,7 +39,7 @@ import tempfile
 ## ============================= main section ===================================
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Test runner')
     parser.add_argument('-rt', '--runtest', action='store', required=False, default="", help='Module with tests, e.g. test.test_class' )
     parser.add_argument('-r', '--repeat', action='store', type=int, default=0, help='Repeat tests given number of times' )
@@ -47,10 +47,10 @@ if __name__ == '__main__':
     parser.add_argument('-cov', '--coverage', action="store_true", help='Measure code coverage' )
     parser.add_argument('--profile', action="store_true", help='Profile the code' )
     parser.add_argument('--pfile', action='store', default=None, help='Profile the code and output data to file' )
-    
+
     args = parser.parse_args()
-    
-    
+
+
     coverageData = None
     ## start code coverage
     if args.coverage == True:
@@ -66,13 +66,13 @@ if __name__ == '__main__':
         coverageData = coverage.Coverage(branch=True, omit=currScript)
         ##coverageData.load()
         coverageData.start()
-        
-        
+
+
     if len(args.runtest) > 0:
         suite = unittest.TestLoader().loadTestsFromName( args.runtest )
     else:
         suite = unittest.TestLoader().discover( script_dir )
-        
+
 
     testsRepeats = int(args.repeat)
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
             print( "Starting profiler" )
             profiler = cProfile.Profile()
             profiler.enable()
-            
+
         ## run proper tests
         if args.untilfailure == True:
             counter = 1
@@ -105,9 +105,9 @@ if __name__ == '__main__':
                 print( "\n" )
         else:
             unittest.TextTestRunner().run(suite)
-    
+
     finally:
-        ## stop profiler            
+        ## stop profiler
         if profiler != None:
             profiler.disable()
             if profiler_outfile == None:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
                 ##pyprof2calltree -i $PROF_FILE -k
                 print( "Launching: pyprof2calltree -i {} -k".format(profiler_outfile) )
                 subprocess.call(["pyprof2calltree", "-i", profiler_outfile, "-k"])
-        
+
         ## prepare coverage results
         if coverageData != None:
             ## convert results to html
@@ -130,10 +130,9 @@ if __name__ == '__main__':
             if not os.path.exists(revCrcTmpDir):
                 os.makedirs(revCrcTmpDir)
             htmlcovdir=revCrcTmpDir+"/htmlcov"
-            
+
             coverageData.stop()
             coverageData.save()
             coverageData.html_report(directory=htmlcovdir)
             print( "\nCoverage HTML output:", (htmlcovdir+"/index.html") )
 
-        

@@ -1,17 +1,17 @@
 #     ClevoKeyboardControl. Control of keyboard backlights.
-# 
+#
 #     Copyright (C) 2018  Arkadiusz Netczuk <dev.arnet@gmail.com>
-# 
+#
 #     This program is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
 #     the Free Software Foundation, either version 3 of the License, or
 #     (at your option) any later version.
-# 
+#
 #     This program is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
-# 
+#
 #     You should have received a copy of the GNU General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
@@ -34,20 +34,20 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ColorWidget(QtBaseClass):
-    
+
     colorChanged   = pyqtSignal( QtGui.QColor )      ## passes RGB value
-    
-    
+
+
     def __init__(self, parentWidget = None):
         super().__init__(parentWidget)
-        
+
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
-        
+
         self.ui.redSB.valueChanged.connect( self.emitColor )
         self.ui.greenSB.valueChanged.connect( self.emitColor )
         self.ui.blueSB.valueChanged.connect( self.emitColor )
-        
+
         self.ui.pickColorPB.clicked.connect(self._pickColor)
 
     def getColor(self):
@@ -69,19 +69,19 @@ class ColorWidget(QtBaseClass):
         color = self.getColor()
         self._updatePreviewColor(color)
         self.colorChanged.emit( color )
-        
+
     def _pickColor(self):
         color = QtWidgets.QColorDialog.getColor()
         if color.isValid() == False:
             _LOGGER.info("picked color is invalid")
             return
         self.setColor( color )
-        
+
     def _updateSpinColor(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
-        
+
         self.blockSignals( True )
         self.ui.redSB.setValue( red )
         self.ui.greenSB.setValue( green )
