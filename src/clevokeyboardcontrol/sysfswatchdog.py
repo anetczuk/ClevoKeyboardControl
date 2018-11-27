@@ -32,6 +32,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class SysFSWatcher:
     """
+    SysFS observer.
+    
     SysFS is not real file system, so there is no assumption about file modification times.
     For example sysfs file content can be changed without changing of it's modification timestamp.
     For instance it happens for keyboard shortcuts.
@@ -127,6 +129,8 @@ class StatResult():
     @property
     def st_mtime(self):
         """
+        st_mtime includeing file hash.
+        
         Watchdog does not support checking for file content, so workaround is
         to incorporate information about content (hash) into 'mtime' field.
         """
