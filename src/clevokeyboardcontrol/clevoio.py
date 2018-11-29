@@ -21,6 +21,7 @@ import os
 import logging
 
 from enum import Enum, unique, auto
+import abc
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -75,11 +76,12 @@ class FilePath(Enum):
         return None
 
 
-class ClevoDriver():
+class ClevoDriver(metaclass=abc.ABCMeta):
 
     def __init__(self):
         pass
 
+    @abc.abstractmethod
     def getDriverRootDirectory(self):
         raise NotImplementedError('You need to define this method in derived class!')
 
@@ -199,9 +201,11 @@ class ClevoDriver():
     def storeString(self, fileType: FilePath, value: str):
         self._store( fileType, value )
 
+    @abc.abstractmethod
     def _read(self, fileType: FilePath):
         raise NotImplementedError('You need to define this method in derived class!')
 
+    @abc.abstractmethod
     def _store(self, fileType: FilePath, value: str):
         raise NotImplementedError('You need to define this method in derived class!')
 
