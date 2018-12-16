@@ -19,6 +19,7 @@
 
 import sys
 import unittest
+import logging
 
 # from testclevokeyboardcontrol.clevodrivermock import ClevoDriverMock
 
@@ -27,6 +28,7 @@ from clevokeyboardcontrol.gui.qt import QApplication, QtCore
 from clevokeyboardcontrol.gui.settings_widget import SettingsWidget as TestWidget
 
 
+_LOGGER = logging.getLogger(__name__)
 app = QApplication(sys.argv)
 
 
@@ -49,6 +51,25 @@ class SettingsWidgetTest(unittest.TestCase):
         self.widget.loadSettings(settings)
         self.assertEqual(self.receiver.driverCounter, 1)        ## receives empty dict
         self.assertEqual(self.receiver.themeCounter, 0)
+
+    def test_saveSettings_default(self):
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, "test-org", "test-app", None)
+
+        self.widget.saveSettings(settings)
+
+        allKeys = settings.allKeys()
+        self.assertEquals( len(allKeys), 3 )
+        self.assertIn("settingsWidget/restoreStart", settings.allKeys())
+        self.assertIn("settingsWidget/restoreSuspend", settings.allKeys())
+        self.assertIn("settingsWidget/trayIcon", settings.allKeys())
+
+        restoreStartValue = settings.value("settingsWidget/restoreStart", None, type=bool)
+        restoreSuspendValue = settings.value("settingsWidget/restoreSuspend", None, type=bool)
+        trayTheme = settings.value("settingsWidget/trayIcon", None, type=str)
+
+        self.assertEquals( restoreStartValue, True )
+        self.assertEquals( restoreSuspendValue, True )
+        self.assertEquals( trayTheme, 'WHITE' )
 
 
 class SettingsReceiver():

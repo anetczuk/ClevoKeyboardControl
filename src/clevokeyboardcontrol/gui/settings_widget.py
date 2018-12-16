@@ -101,12 +101,8 @@ class SettingsWidget(QtBaseClass):
         self._emitDriverRestore( restoreStartValue )
 
     def _loadDriverState(self, settings):
-        state = dict()
         settings.beginGroup( "DriverState" )
-        for key in settings.childKeys():
-            value = settings.value(key, "", type=str)
-            if len(value) > 0:
-                state[ key ] = value
+        state = loadKeysToDict( settings )
         settings.endGroup()
         if bool(state) is False:
             ## state dictionary is empty
@@ -153,3 +149,13 @@ class SettingsWidget(QtBaseClass):
             self.restoreDriver.emit( self.driverState )
         else:
             self.restoreDriver.emit( dict() )
+
+
+def loadKeysToDict(settings):
+    state = dict()
+    for key in settings.childKeys():
+        value = settings.value(key, "", type=str)
+        if len(value) > 0:
+            state[ key ] = value
+    return state
+
