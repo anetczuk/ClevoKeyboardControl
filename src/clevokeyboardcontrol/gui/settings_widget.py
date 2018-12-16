@@ -39,7 +39,7 @@ class SettingsWidget(QtBaseClass):
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
 
-        self.driverState = None
+        self.driverState = dict()
 
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
@@ -131,9 +131,10 @@ class SettingsWidget(QtBaseClass):
         settings.endGroup()
 
     def _saveDriverState(self, settings):
-        _LOGGER.debug( "Saving driver state: %r", self.driverState )
-        if self.driverState is None:
+        if bool(self.driverState) is False:
+            ## state dictionary is empty
             return
+        _LOGGER.debug( "Saving driver state: %r", self.driverState )
         settings.beginGroup( "DriverState" )
         for key in self.driverState:
             val = self.driverState[ key ]
@@ -143,7 +144,7 @@ class SettingsWidget(QtBaseClass):
     def _setCurrentTrayTheme( self, trayTheme: str ):
         themeIndex = TrayIconTheme.indexOf( trayTheme )
         if themeIndex < 0:
-            _LOGGER.warn("could not find index for theme: %r", trayTheme)
+            _LOGGER.debug("could not find index for theme: %r", trayTheme)
             return
         self.ui.trayThemeCB.setCurrentIndex( themeIndex )
 
