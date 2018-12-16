@@ -39,12 +39,12 @@ class QSuspendTimer( QtCore.QObject ):
         self.timer.timeout.connect( self.checkResumed )
 
     def start(self):
-        _LOGGER.debug("starting suspension detector")
+        _LOGGER.debug("starting suspension timer")
         self.lastTime = None
         self.timer.start( 1000 )                            ## triggered every second
 
     def stop(self):
-        _LOGGER.debug("stopping suspension detector")
+        _LOGGER.debug("stopping suspension timer")
         self.timer.stop()
 
     def checkResumed(self):

@@ -177,7 +177,7 @@ class ClevoDriver(metaclass=abc.ABCMeta):
         return ret
 
     def setDriverState(self, stateDict: dict):
-        _LOGGER.debug("setting driver's state")
+        _LOGGER.debug("setting driver's state: %r", stateDict)
         for key in stateDict:
             val = stateDict[ key ]
             keyEnum = FilePath.findByName( key )
