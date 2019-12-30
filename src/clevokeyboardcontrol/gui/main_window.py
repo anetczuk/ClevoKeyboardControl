@@ -19,6 +19,7 @@
 import logging
 import subprocess
 import os
+import getpass
 
 from .qt import qApp, QIcon, QtCore, QMessageBox
 from . import uiloader
@@ -63,21 +64,22 @@ class MainWindow(QtBaseClass):
     def noDriverPermission(self):
         _LOGGER.debug( "received no permission signal" )
         self.ui.stackedWidget.setCurrentWidget( self.ui.errorPage )
-        
+
     def fixPermissions(self):
         _LOGGER.debug( "fixing permissions" )
         
         ##configure_udev
         appDir = os.getcwd()
-        ret = subprocess.call(["pkexec", appDir + "/configure_udev.sh"])        
+        username = getpass.getuser()
+        ret = subprocess.call( ["pkexec", appDir + "/configure_udev.sh", "--user=" + username] )
         errorCode = int(ret)
         if errorCode is not 0:
             _LOGGER.debug( "returned subprocess exit code: %s", errorCode )
             QMessageBox.critical(self, 'Error', "Could not fix driver permissions.")
             return
-                 
+ 
         QMessageBox.information(self, 'Info', "Fixed driver permissions. Reboot the system.")
-        
+ 
         ## refresh view
         self.ui.stackedWidget.setCurrentWidget( self.ui.tabPage )
         self.loadSettings()

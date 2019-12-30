@@ -1,10 +1,29 @@
 #!/bin/bash
 
+set -eu
+
 
 if [ "$EUID" -ne 0 ]; then 
     echo "Please run as root"
-    exit
+    exit 1
 fi
+
+
+##
+## Parse arguments
+##
+USER=""
+for i in "$@"; do
+    case $i in
+        -u=*|--user=*)
+            USER="${i#*=}"
+            shift # past argument=value
+            ;;
+        *)
+            ## unknown option
+            ;;
+    esac
+done
 
 
 ## add group
@@ -12,7 +31,13 @@ KBD_GROUP=clevo-keyboard
 
 groupadd "$KBD_GROUP"
 
-echo -e "call:\n\tsudo usermod -a -G $KBD_GROUP userName\nto add user to $KBD_GROUP group"
+
+if [ ! -z "$USER" ]; then
+    echo "adding user $USER to group $KBD_GROUP"
+    usermod -a -G "$KBD_GROUP" "$USER"
+else
+    echo -e "call:\n\tsudo usermod -a -G $KBD_GROUP userName\nto add user to $KBD_GROUP group"
+fi
 
 
 ## add udev rule
