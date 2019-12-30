@@ -86,6 +86,7 @@ class ClevoDriver(metaclass=abc.ABCMeta):
         raise NotImplementedError('You need to define this method in derived class!')
 
     def getState(self):
+        ''' Is LED powered on? '''
         value = int( self.readString(FilePath.STATE_PATH) )
         _LOGGER.debug("got state: %r",  value)
         if value == 0:
@@ -248,8 +249,8 @@ class TuxedoDriver( ClevoDriver ):
             return dataStr
         except PermissionError:
 #           sys.exit("needs to be run as root!")
-            _LOGGER.exception("exception occurred")
-            return None
+            _LOGGER.error("unable to read data for file[%s]", filePath)
+            raise
         finally:
             if file is not None:
                 file.close()
@@ -263,10 +264,9 @@ class TuxedoDriver( ClevoDriver ):
             dataStr = dataStr.rstrip()
             data = bytes( dataStr + "\n", 'UTF-8' )
             os.write(fd, data )
-        except OSError:
-            _LOGGER.exception("unable to store data[%s] for file[%s]", value, fileType)
         except PermissionError:
-            _LOGGER.exception("exception occurred")
+            _LOGGER.error("unable to store data[%s] for file[%s]", value, filePath)
+            raise
         finally:
             if fd is not None:
                 os.close(fd)

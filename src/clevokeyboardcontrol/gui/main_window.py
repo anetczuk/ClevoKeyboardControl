@@ -17,8 +17,10 @@
 #
 
 import logging
+import subprocess
+import os
 
-from .qt import qApp, QIcon, QtCore
+from .qt import qApp, QIcon, QtCore, QMessageBox
 from . import uiloader
 from . import tray_icon
 from . import resources
@@ -47,13 +49,38 @@ class MainWindow(QtBaseClass):
         self.setIconTheme( tray_icon.TrayIconTheme.WHITE )
 
         self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.driverChanged )
+        self.ui.driverWidget.permissionDenied.connect( self.noDriverPermission )
         self.ui.settingsWidget.restoreDriver.connect( self.ui.driverWidget.restoreDriver )
 
         self.ui.settingsWidget.iconThemeChanged.connect( self.setIconTheme )
 
+        self.ui.fixPermissionsPB.clicked.connect( self.fixPermissions )
+
         self.ui.driverWidget.attachDriver( driver )
 
         self.trayIcon.show()
+
+    def noDriverPermission(self):
+        _LOGGER.debug( "received no permission signal" )
+        self.ui.stackedWidget.setCurrentWidget( self.ui.errorPage )
+        
+    def fixPermissions(self):
+        _LOGGER.debug( "fixing permissions" )
+        
+        ##configure_udev
+        appDir = os.getcwd()
+        ret = subprocess.call(["pkexec", appDir + "/configure_udev.sh"])        
+        errorCode = int(ret)
+        if errorCode is not 0:
+            _LOGGER.debug( "returned subprocess exit code: %s", errorCode )
+            QMessageBox.critical(self, 'Error', "Could not fix driver permissions.")
+            return
+                 
+        QMessageBox.information(self, 'Info', "Fixed driver permissions. Reboot the system.")
+        
+        ## refresh view
+        self.ui.stackedWidget.setCurrentWidget( self.ui.tabPage )
+        self.loadSettings()
 
     def loadSettings(self):
         settings = self.getSettings()

@@ -22,6 +22,7 @@ try:
     from PyQt5.QtWidgets import QSizePolicy
     from PyQt5.QtWidgets import QStyle, QMenu, QAction
     from PyQt5.QtWidgets import QHBoxLayout
+    from PyQt5.QtWidgets import QMessageBox
 
     from PyQt5 import QtGui
     from PyQt5.QtGui import QIcon

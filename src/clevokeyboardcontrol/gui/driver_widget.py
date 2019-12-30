@@ -34,7 +34,8 @@ _LOGGER = logging.getLogger(__name__)
 
 class DriverWidget(QtBaseClass):
 
-    driverChanged = pyqtSignal( ClevoDriver )
+    driverChanged    = pyqtSignal( ClevoDriver )
+    permissionDenied = pyqtSignal( )
 
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
@@ -85,7 +86,7 @@ class DriverWidget(QtBaseClass):
 
     def refreshWidgets(self):
         self._refreshView()
-        self.driverChanged.emit( self.driver )
+        self._emitDriverChange()
 
     def _refreshView(self):
         _LOGGER.debug("refreshing widget")
@@ -125,6 +126,7 @@ class DriverWidget(QtBaseClass):
         self.ui.rightColor.blockSignals( False )
 
     def refreshDriver(self):
+        ''' Set drivers values from GUI controls '''
         enabled = self.ui.stateCB.isChecked()
         self.driver.setState( enabled )
 
@@ -147,8 +149,12 @@ class DriverWidget(QtBaseClass):
 
     def restoreDriver(self, driverState: dict):
         _LOGGER.debug( "restoring driver state" )
-        self.driver.setDriverState( driverState )
-        self._refreshView()
+        try:
+            self.driver.setDriverState( driverState )
+            self._refreshView()
+        except PermissionError:
+            _LOGGER.exception("unable to restore driver state")
+            self.permissionDenied.emit()
 
     ### ==============================================
 
