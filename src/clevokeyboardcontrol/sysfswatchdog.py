@@ -88,7 +88,7 @@ class Handler(FileSystemEventHandler):
             _LOGGER.debug("detected driver external change -- no callback")
             return
 
-        _LOGGER.debug("detected driver external change")
+        _LOGGER.debug( "detected driver external change: {0}".format(event) )
         self.callback()
 
 

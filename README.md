@@ -8,6 +8,7 @@ restores lights settings after startup and returning from suspend state.
 - system tray icon
 - persisting application settings
 - restoring LED seetings after suspension / hibernation
+- turning LED off durning screen saver
 - detection of LED settings changed externally
 
 
@@ -19,9 +20,11 @@ restores lights settings after startup and returning from suspend state.
 
 ## Requirements
 - *Clevo* based device
+- *tuxedo-keyboard* driver
 - *PyQt5*
 - *watchdog*
-- *tuxedo-keyboard* driver
+
+It's recommended to install *PyQt5* by ```apt install python3-pyqt5```
 
 For more info about installing *tuxedo-keyboard* driver visit:
 https://github.com/tuxedocomputers/tuxedo-keyboard
@@ -39,7 +42,7 @@ Then add Your user to the group. It might require rebooting the system.
 To run application try one of:
 - run *src/clevokbdctl*
 - run *src/clevokeyboardcontrol/main.py* 
-- execute *cd src; python3 -m clevokeyboardcontrol*
+- execute ```cd src; python3 -m clevokeyboardcontrol```
 
 Application can be run in profiler mode passing *--profile* as command line parameter. 
 
@@ -73,7 +76,7 @@ No special proviledges required.
 
 ## ToDo
 - add support for old *clevo-wmi* driver
-- add keyboard sleep option
+- add keyboard sleep option (after certain inactivity)
 
 
 ## References

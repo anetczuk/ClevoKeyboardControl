@@ -117,6 +117,12 @@ class QSuspendDetector( QtCore.QObject ):
         super().__init__( parent )
         self.detector = QSuspendSingleton()
 
+    def setEnabled(self, enable=True):
+        if enable:
+            self.start()
+        else:
+            self.stop()
+
     def start(self):
         _LOGGER.debug("starting suspension detector")
         self.detector.resumed.connect( self.resumed )

@@ -126,7 +126,7 @@ class DriverWidget(QtBaseClass):
         self.ui.rightColor.blockSignals( False )
 
     def refreshDriver(self):
-        ''' Set drivers values from GUI controls '''
+        """Set drivers values from GUI controls."""
         enabled = self.ui.stateCB.isChecked()
         self.driver.setState( enabled )
 

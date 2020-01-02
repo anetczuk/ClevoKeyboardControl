@@ -21,7 +21,6 @@ import logging
 
 from . import uiloader
 from .qt import pyqtSignal
-from . import suspenddetector
 from .tray_icon import TrayIconTheme
 
 
@@ -33,8 +32,10 @@ _LOGGER = logging.getLogger(__name__)
 
 class SettingsWidget(QtBaseClass):
 
-    restoreDriver       = pyqtSignal( dict )
-    iconThemeChanged    = pyqtSignal( TrayIconTheme )
+    restoreDriver            = pyqtSignal( dict )
+    iconThemeChanged         = pyqtSignal( TrayIconTheme )
+    handleSuspendChanged     = pyqtSignal( bool )
+    handleScreenSaverChanged = pyqtSignal( bool )
 
     def __init__(self, parentWidget=None):
         super().__init__(parentWidget)
@@ -44,13 +45,12 @@ class SettingsWidget(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
-        self.suspendDetector = suspenddetector.QSuspendDetector(self)
-        self.suspendDetector.resumed.connect( self._suspensionRestored )
-
         self.ui.restoreSuspendCB.stateChanged.connect( self._toggleResumeSuspend )
+        self.ui.screenSaverLEDOffCB.stateChanged.connect( self._toggleScreenSaverLED )
 
         self.ui.restoreStartCB.setChecked( True )
         self.ui.restoreSuspendCB.setChecked( True )
+        self.ui.screenSaverLEDOffCB.setChecked( True )
 
         ## tray combo box
         self.ui.trayThemeCB.currentIndexChanged.connect( self._trayThemeChanged )
@@ -58,27 +58,31 @@ class SettingsWidget(QtBaseClass):
             itemName = item.name
             self.ui.trayThemeCB.addItem( itemName, item )
 
-    def driverChanged(self, driver):
+    def readDriverState(self, driver):
         self.driverState = driver.readDriverState()
         ##_LOGGER.info("driver state: %r", self.driverState)
 
+    def requestDriverRestore(self):
+        self._emitDriverRestore( True )
+
     ## =====================================================
 
-    def _suspensionRestored(self):
-        self._emitDriverRestore()
+    def _trayThemeChanged(self):
+        selectedTheme = self.ui.trayThemeCB.currentData()
+        self.iconThemeChanged.emit( selectedTheme )
 
     def _toggleResumeSuspend(self, state):
         ## state: 0 -- unchecked
         ## state: 2 -- checked
         enabled = (state != 0)
-        if enabled is True:
-            self.suspendDetector.start()
-        else:
-            self.suspendDetector.stop()
+        self.handleSuspendChanged.emit( enabled )
 
-    def _trayThemeChanged(self):
-        selectedTheme = self.ui.trayThemeCB.currentData()
-        self.iconThemeChanged.emit( selectedTheme )
+    def _toggleScreenSaverLED(self, state):
+        ##_LOGGER.info("toggling screen saver LED")
+        ## state: 0 -- unchecked
+        ## state: 2 -- checked
+        enabled = (state != 0)
+        self.handleScreenSaverChanged.emit( enabled )
 
     ## =====================================================
 
@@ -93,22 +97,15 @@ class SettingsWidget(QtBaseClass):
         restoreSuspendValue = settings.value("restoreSuspend", True, type=bool)
         self.ui.restoreSuspendCB.setChecked( restoreSuspendValue )
 
+        handleScreenSaverLEDValue = settings.value("turnLEDOffOnScreenSaver", True, type=bool)
+        self.ui.screenSaverLEDOffCB.setChecked( handleScreenSaverLEDValue )
+
         trayTheme = settings.value("trayIcon", None, type=str)
         self._setCurrentTrayTheme( trayTheme )
 
         settings.endGroup()
 
         self._emitDriverRestore( restoreStartValue )
-
-    def _loadDriverState(self, settings):
-        settings.beginGroup( "DriverState" )
-        state = loadKeysToDict( settings )
-        settings.endGroup()
-        if bool(state) is False:
-            ## state dictionary is empty
-            return
-        self.driverState = state
-        _LOGGER.debug( "loaded driver state: %r", self.driverState )
 
     def saveSettings(self, settings):
         self._saveDriverState(settings)
@@ -121,10 +118,23 @@ class SettingsWidget(QtBaseClass):
         restoreSuspendValue = self.ui.restoreSuspendCB.isChecked()
         settings.setValue("restoreSuspend", restoreSuspendValue)
 
+        handleScreenSaverLEDValue = self.ui.screenSaverLEDOffCB.isChecked()
+        settings.setValue("turnLEDOffOnScreenSaver", handleScreenSaverLEDValue)
+
         selectedTheme = self.ui.trayThemeCB.currentData()
         settings.setValue("trayIcon", selectedTheme.name)
 
         settings.endGroup()
+
+    def _loadDriverState(self, settings):
+        settings.beginGroup( "DriverState" )
+        state = loadKeysToDict( settings )
+        settings.endGroup()
+        if bool(state) is False:
+            ## state dictionary is empty
+            return
+        self.driverState = state
+        _LOGGER.debug( "loaded driver state: %r", self.driverState )
 
     def _saveDriverState(self, settings):
         if bool(self.driverState) is False:

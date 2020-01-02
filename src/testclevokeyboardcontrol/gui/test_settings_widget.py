@@ -58,18 +58,21 @@ class SettingsWidgetTest(unittest.TestCase):
         self.widget.saveSettings(settings)
 
         allKeys = settings.allKeys()
-        self.assertEquals( len(allKeys), 3 )
+        self.assertEquals( len(allKeys), 4 )
         self.assertIn("settingsWidget/restoreStart", settings.allKeys())
         self.assertIn("settingsWidget/restoreSuspend", settings.allKeys())
         self.assertIn("settingsWidget/trayIcon", settings.allKeys())
+        self.assertIn("settingsWidget/turnLEDOffOnScreenSaver", settings.allKeys())
 
         restoreStartValue = settings.value("settingsWidget/restoreStart", None, type=bool)
         restoreSuspendValue = settings.value("settingsWidget/restoreSuspend", None, type=bool)
         trayTheme = settings.value("settingsWidget/trayIcon", None, type=str)
+        turnLEDValue = settings.value("settingsWidget/turnLEDOffOnScreenSaver", None, type=bool)
 
         self.assertEquals( restoreStartValue, True )
         self.assertEquals( restoreSuspendValue, True )
         self.assertEquals( trayTheme, 'WHITE' )
+        self.assertEquals( turnLEDValue, True )
 
 
 class SettingsReceiver():

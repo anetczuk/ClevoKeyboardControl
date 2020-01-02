@@ -40,13 +40,20 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QComboBox" name="trayThemeCB"/>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="trayThemeText">
      <property name="text">
       <string>Tray icon theme:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QCheckBox" name="screenSaverLEDOffCB">
+     <property name="text">
+      <string>Turn off LED during screen saver</string>
      </property>
     </widget>
    </item>

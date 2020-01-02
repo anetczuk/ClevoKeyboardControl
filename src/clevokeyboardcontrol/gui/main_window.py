@@ -26,6 +26,9 @@ from . import uiloader
 from . import tray_icon
 from . import resources
 
+from . import suspenddetector
+from .. import screensaverwatcher
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,26 +43,37 @@ class MainWindow(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
+        ## configure detectors
+        self.suspendDetector = suspenddetector.QSuspendDetector(self)
+        self.suspendDetector.resumed.connect( self.ui.settingsWidget.requestDriverRestore )
+
+        self.screenSaverDetector = screensaverwatcher.ScreenSaverWatcher()
+        self.screenSaverDetector.setCallback( self._screenSaverActivationCallback )
+
+        ## connect widgets
         self.ui.actionExit.triggered.connect( qApp.quit )
 
-        self.statusBar().showMessage("Ready")
+        self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.readDriverState )
+        self.ui.driverWidget.permissionDenied.connect( self.noDriverPermission )
+
+        self.ui.settingsWidget.restoreDriver.connect( self.ui.driverWidget.restoreDriver )
+        self.ui.settingsWidget.iconThemeChanged.connect( self.setIconTheme )
+        self.ui.settingsWidget.handleSuspendChanged.connect( self.suspendDetector.setEnabled )
+        self.ui.settingsWidget.handleScreenSaverChanged.connect( self.screenSaverDetector.setEnabled )
+
+        self.ui.fixPermissionsPB.clicked.connect( self.fixPermissions )
+
+        ## other operations
+        self.ui.driverWidget.attachDriver( driver )
 
         self.trayIcon = tray_icon.TrayIcon(self)
         self.trayIcon.setToolTip("Clevo Keyboard")
 
         self.setIconTheme( tray_icon.TrayIconTheme.WHITE )
 
-        self.ui.driverWidget.driverChanged.connect( self.ui.settingsWidget.driverChanged )
-        self.ui.driverWidget.permissionDenied.connect( self.noDriverPermission )
-        self.ui.settingsWidget.restoreDriver.connect( self.ui.driverWidget.restoreDriver )
-
-        self.ui.settingsWidget.iconThemeChanged.connect( self.setIconTheme )
-
-        self.ui.fixPermissionsPB.clicked.connect( self.fixPermissions )
-
-        self.ui.driverWidget.attachDriver( driver )
-
         self.trayIcon.show()
+
+        self.statusBar().showMessage("Ready")
 
     def noDriverPermission(self):
         _LOGGER.debug( "received no permission signal" )
@@ -67,7 +81,7 @@ class MainWindow(QtBaseClass):
 
     def fixPermissions(self):
         _LOGGER.debug( "fixing permissions" )
-        
+
         ##configure_udev
         appDir = os.getcwd()
         username = getpass.getuser()
@@ -77,12 +91,23 @@ class MainWindow(QtBaseClass):
             _LOGGER.debug( "returned subprocess exit code: %s", errorCode )
             QMessageBox.critical(self, 'Error', "Could not fix driver permissions.")
             return
- 
+
         QMessageBox.information(self, 'Info', "Fixed driver permissions. Reboot the system.")
- 
+
         ## refresh view
         self.ui.stackedWidget.setCurrentWidget( self.ui.tabPage )
         self.loadSettings()
+
+    def _screenSaverActivationCallback(self, newState):
+        _LOGGER.info( "screen saver activation: %s", newState )
+        if newState:
+            ## turn off
+            self.ui.driverWidget.driver.setState( False )
+        else:
+            ## turn on
+            self.ui.driverWidget.driver.setState( True )
+
+    # ================================================================
 
     def loadSettings(self):
         settings = self.getSettings()

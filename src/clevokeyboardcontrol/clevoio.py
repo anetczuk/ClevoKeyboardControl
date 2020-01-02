@@ -86,7 +86,7 @@ class ClevoDriver(metaclass=abc.ABCMeta):
         raise NotImplementedError('You need to define this method in derived class!')
 
     def getState(self):
-        ''' Is LED powered on? '''
+        """Says if LED powered on."""
         value = int( self.readString(FilePath.STATE_PATH) )
         _LOGGER.debug("got state: %r",  value)
         if value == 0:
