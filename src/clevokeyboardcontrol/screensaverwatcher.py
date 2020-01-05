@@ -25,7 +25,6 @@ from .sysfswatchdog import SysFSWatcher
 _LOGGER = logging.getLogger(__name__)
 
 
-
 def readFile( file_path ):
     file = None
     try:
@@ -103,7 +102,7 @@ class DeviceWatcher():
         if currVal == 0:
             return True
         return False
-#         return currVal == 0
+
 
 DeviceWatcher.logger = _LOGGER.getChild(DeviceWatcher.__name__)
 
@@ -111,8 +110,8 @@ DeviceWatcher.logger = _LOGGER.getChild(DeviceWatcher.__name__)
 class ScreenSaverWatcher():
     """
     Watch for changes in backlight driver.
-    
-    Note: Xfce blocks Qt event loop when session is locked, so it cannot be 
+
+    Note: Xfce blocks Qt event loop when session is locked, so it cannot be
     wrapped around QtObject if backlight needs to be monitored even when user's
     session is locked.
     """

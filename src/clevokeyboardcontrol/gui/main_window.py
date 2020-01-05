@@ -35,17 +35,17 @@ _LOGGER = logging.getLogger(__name__)
 
 
 # class QScreenSaverDetector( QtCore.QObject ):
-# 
+#
 #     ssaverChanged  = pyqtSignal( bool )
-# 
+#
 #     def __init__(self, parent):
 #         super().__init__( parent )
 #         self.detector = screensaverwatcher.ScreenSaverWatcher()
 #         self.detector.setCallback( self._screenSaverActivationCallback )
-# 
+#
 #     def setEnabled(self, newState):
 #         self.detector.setEnabled( newState )
-# 
+#
 #     def _screenSaverActivationCallback(self, newState):
 #         self.ssaverChanged.emit( newState )
 

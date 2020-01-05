@@ -43,7 +43,7 @@ class QSysFSWatcher( QtCore.QObject ):
         self.detector.setEnabled(newState)
 
     def ignoreNextEvent(self):
-        self.detector.ignoreNextEvent()        
+        self.detector.ignoreNextEvent()
 
     def stop(self):
         self.detector.stop()
