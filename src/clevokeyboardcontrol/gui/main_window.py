@@ -22,6 +22,7 @@ import os
 import getpass
 
 from .qt import qApp, QIcon, QtCore, QMessageBox
+# from .qt import pyqtSignal
 from . import uiloader
 from . import tray_icon
 from . import resources
@@ -31,6 +32,22 @@ from .. import screensaverwatcher
 
 
 _LOGGER = logging.getLogger(__name__)
+
+
+# class QScreenSaverDetector( QtCore.QObject ):
+# 
+#     ssaverChanged  = pyqtSignal( bool )
+# 
+#     def __init__(self, parent):
+#         super().__init__( parent )
+#         self.detector = screensaverwatcher.ScreenSaverWatcher()
+#         self.detector.setCallback( self._screenSaverActivationCallback )
+# 
+#     def setEnabled(self, newState):
+#         self.detector.setEnabled( newState )
+# 
+#     def _screenSaverActivationCallback(self, newState):
+#         self.ssaverChanged.emit( newState )
 
 
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
@@ -43,7 +60,7 @@ class MainWindow(QtBaseClass):
         self.ui = UiTargetClass()
         self.ui.setupUi(self)
 
-        ## configure detectors
+        ## configure objects
         self.suspendDetector = suspenddetector.QSuspendDetector(self)
         self.suspendDetector.resumed.connect( self.ui.settingsWidget.requestDriverRestore )
 
@@ -102,10 +119,10 @@ class MainWindow(QtBaseClass):
         _LOGGER.info( "screen saver activation: %s", newState )
         if newState:
             ## turn off
-            self.ui.driverWidget.driver.setState( False )
+            self.ui.driverWidget.turnLED( False )
         else:
             ## turn on
-            self.ui.driverWidget.driver.setState( True )
+            self.ui.driverWidget.turnLED( True )
 
     # ================================================================
 

@@ -25,6 +25,22 @@ from .sysfswatchdog import SysFSWatcher
 _LOGGER = logging.getLogger(__name__)
 
 
+
+def readFile( file_path ):
+    file = None
+    try:
+        file = open( file_path, "r")
+        dataStr = str(file.readline())
+        dataStr = dataStr.rstrip()
+        return dataStr
+    except Exception:
+        _LOGGER.error("unable to read data for file[%s]", file_path)
+        raise
+    finally:
+        if file is not None:
+            file.close()
+
+
 class DeviceWatcher():
 
     logger = None
@@ -43,7 +59,7 @@ class DeviceWatcher():
 #         self.brightnessWatcher.setCallback( self._sysfsBrightnessChanged )
 #         self.brightnessWatcher.watch( self.brightnessFile, False )
 
-        self.watcher = SysFSWatcher()
+        self.watcher = SysFSWatcher("SSaverThread")
         self.watcher.setCallback( self._sysfsPowerChanged )
         self.watcher.watch( self.driverPath, False )
 
@@ -63,15 +79,17 @@ class DeviceWatcher():
     def _sysfsPowerChanged(self):
         newValue = self._readPower()
         if newValue == self.blPower:
+            self.logger.debug( "power file not changed" )
             return
         self.blPower = newValue
         if self.stateCallback is None:
             self.logger.debug( "power file changed to: %s" % newValue )
             return
+        self.logger.debug( "power file changed to: %s" % newValue )
         self.stateCallback( self.watcherIndex )
 
 #     def _readActualBrightness(self):
-#         return int( self._read(self.brightnessFile) )
+#         return int( readFile(self.brightnessFile) )
 
     def _readPower(self):
         """
@@ -81,34 +99,23 @@ class DeviceWatcher():
         """
         ## 0 -- power on
         ## 4 -- power off
-        currVal = int( self._read(self.powerFile) )
+        currVal = int( readFile(self.powerFile) )
         if currVal == 0:
             return True
         return False
 #         return currVal == 0
 
-    def _read( self, file_path ):
-#         _LOGGER.debug("reading from file: %s", file_path)
-        file = None
-        try:
-            file = open( file_path, "r")
-            dataStr = str(file.readline())
-            dataStr = dataStr.rstrip()
-#             _LOGGER.debug("returning value: %s", dataStr)
-            return dataStr
-        except PermissionError:
-#           sys.exit("needs to be run as root!")
-            _LOGGER.error("unable to read data for file[%s]", file_path)
-            raise
-        finally:
-            if file is not None:
-                file.close()
-
-
 DeviceWatcher.logger = _LOGGER.getChild(DeviceWatcher.__name__)
 
 
 class ScreenSaverWatcher():
+    """
+    Watch for changes in backlight driver.
+    
+    Note: Xfce blocks Qt event loop when session is locked, so it cannot be 
+    wrapped around QtObject if backlight needs to be monitored even when user's
+    session is locked.
+    """
 
     logger = None
 

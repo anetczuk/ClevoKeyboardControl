@@ -39,15 +39,21 @@ class SysFSWatcher:
     For instance it happens for keyboard shortcuts.
     """
 
-    def __init__(self):
+    def __init__(self, threadName=None):
         self.observer = FileContentObserver()
         self.event_handler = Handler()
+        if threadName is not None:
+            ## set thread name
+            self.observer.setName( threadName )
 
     def setCallback(self, callback):
         self.event_handler.callback = callback
 
     def ignoreNextEvent(self):
-        self.event_handler.ignoreNextEvent = True
+        self.event_handler.ignoreNextEvent()
+
+    def setEnabled(self, newState):
+        return self.event_handler.setEnabled(newState)
 
     def watch(self, directoryPath, recursiveMode: bool):
         if directoryPath is None:
@@ -69,19 +75,60 @@ class SysFSWatcher:
         self.observer.join()
 
 
+class WatcherBlocker:
+    """
+    Context guard.
+
+    Disables watcher callbacks in "with" scope.
+    """
+
+    def __init__(self, watcher):
+        self.watcher = watcher
+        self.oldEnabled = None
+
+    def __enter__(self):
+        if self.watcher is None:
+            return
+        _LOGGER.debug( "disabling sysfs watcher" )
+        self.oldEnabled = self.watcher.setEnabled( False )
+        self.watcher.ignoreNextEvent()
+
+    def __exit__(self, exceptionType, value, traceback):
+        if self.watcher is None:
+            return False                                                            ## do not suppress exceptions
+        if self.oldEnabled is None:
+            return False                                                            ## do not suppress exceptions
+        _LOGGER.debug( "restoring sysfs watcher state: %s" % self.oldEnabled )
+        self.watcher.setEnabled( self.oldEnabled )
+        return False                                                                ## do not suppress exceptions
+
+
 class Handler(FileSystemEventHandler):
 
     def __init__(self):
         super().__init__()
+        self.enabled = True
         self.callback = None
-        self.ignoreNextEvent = False
+        self.ignoreEventCounter = 0
+
+    def ignoreNextEvent(self):
+        self.ignoreEventCounter += 1
+
+    def setEnabled(self, newState):
+        oldState = self.enabled
+        self.enabled = newState
+        return oldState
 
     def on_any_event(self, event):
         ##_LOGGER.info( "Directory content modified - %s, %r", event.src_path, event )
 
-        if self.ignoreNextEvent is True:
+        if self.ignoreEventCounter > 0:
             _LOGGER.debug("detected driver external change -- ignored")
-            self.ignoreNextEvent = False
+            self.ignoreEventCounter -= 1
+            return
+
+        if self.enabled is False:
+            _LOGGER.debug("detected driver external change -- disabled")
             return
 
         if self.callback is None:

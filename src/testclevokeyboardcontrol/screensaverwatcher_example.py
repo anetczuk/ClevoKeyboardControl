@@ -22,7 +22,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ScreenSaverActivity():
-    
+
     def __init__(self):
         self.detector = ScreenSaverWatcher()
         self.detector.setCallback( self._screenSaverActivationCallback )
@@ -33,11 +33,11 @@ class ScreenSaverActivity():
 
 if __name__ == '__main__':
     #from .main import main
-    
+
     _LOGGER.debug("Logger log file: %s" % logger.log_file)
 
     activity = ScreenSaverActivity()
-    
+
     # Start the loop and wait for the signal
     GObject.MainLoop().run()
 

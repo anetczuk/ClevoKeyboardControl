@@ -24,12 +24,38 @@ from .qt import pyqtSignal
 from .qt import QtCore, QtGui
 from ..clevoio import Mode as ClevoMode, ClevoDriver
 from ..sysfswatchdog import SysFSWatcher
-
-
-UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
+from ..sysfswatchdog import WatcherBlocker
 
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class QSysFSWatcher( QtCore.QObject ):
+
+    sysfsChanged  = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__( parent )
+        self.detector = SysFSWatcher("DriverThread")
+        self.detector.setCallback( self._sysfsCallback )
+
+    def setEnabled(self, newState):
+        self.detector.setEnabled(newState)
+
+    def ignoreNextEvent(self):
+        self.detector.ignoreNextEvent()        
+
+    def stop(self):
+        self.detector.stop()
+
+    def watch(self, directoryPath, recursiveMode: bool):
+        self.detector.watch(directoryPath, recursiveMode)
+
+    def _sysfsCallback(self):
+        self.sysfsChanged.emit()
+
+
+UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
 class DriverWidget(QtBaseClass):
@@ -77,8 +103,8 @@ class DriverWidget(QtBaseClass):
 
         if self.watcher is not None:
             self.watcher.stop()
-        self.watcher = SysFSWatcher()
-        self.watcher.setCallback( self._sysfsChanged )
+        self.watcher = QSysFSWatcher(self)
+        self.watcher.sysfsChanged.connect( self._sysfsChanged )
         driverDir = self.driver.getDriverRootDirectory()
         self.watcher.watch(driverDir, False)
 
@@ -89,7 +115,7 @@ class DriverWidget(QtBaseClass):
         self._emitDriverChange()
 
     def _refreshView(self):
-        _LOGGER.debug("refreshing widget")
+        _LOGGER.debug("reading widget state from driver")
 
         self.ui.stateCB.blockSignals( True )
         ledOn = self.driver.getState()
@@ -156,6 +182,14 @@ class DriverWidget(QtBaseClass):
             _LOGGER.exception("unable to restore driver state")
             self.permissionDenied.emit()
 
+    def turnLED(self, newState):
+        ## Xfce4 stops Qt main loop, so turning LED when screen saver changes during session lock is impossible.
+        ## Workaround is to change LED state without use of signals/slots.
+        self.ui.stateCB.blockSignals( True )
+        self.ui.stateCB.setChecked( newState )
+        self.ui.stateCB.blockSignals( False )
+        self._toggleLED( newState )
+
     ### ==============================================
 
     def _sysfsChanged(self):
@@ -167,14 +201,16 @@ class DriverWidget(QtBaseClass):
     def _toggleLED(self, state):
         ## state: 0 -- unchecked
         ## state: 2 -- checked
-        enabled = (state != 0)
-        self.driver.setState( enabled )
-        self._emitDriverChange()
+        with WatcherBlocker(self.watcher):
+            enabled = (state != 0)
+            self.driver.setState( enabled )
+            self._emitDriverChange()
 
     def _brightnessChanged(self, value: int):
-        self.driver.setBrightness( value )
-        self._setBrightnessLabel( value )
-        self._emitDriverChange()
+        with WatcherBlocker(self.watcher):
+            self.driver.setBrightness( value )
+            self._setBrightnessLabel( value )
+            self._emitDriverChange()
 
     def _setBrightnessLabel(self, value: int):
         valueString = str(value)
@@ -185,30 +221,43 @@ class DriverWidget(QtBaseClass):
         self.ui.brightnessValue.setText( valueString )
 
     def _modeChanged(self):
-        selectedMode = self.ui.modeCB.currentData()
-        self.driver.setMode( selectedMode )
-        self._emitDriverChange()
+        with WatcherBlocker(self.watcher):
+            selectedMode = self.ui.modeCB.currentData()
+            self.driver.setMode( selectedMode )
+            self._emitDriverChange()
 
     def _leftColorChanged(self, color):
+        with WatcherBlocker(self.watcher):
+            self._setDeviceLeftColor(color)
+            self._emitDriverChange()
+
+    def _setDeviceLeftColor(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorLeft( red, green, blue )
-        self._emitDriverChange()
 
     def _centerColorChanged(self, color):
+        with WatcherBlocker(self.watcher):
+            self._setDeviceCenterColor(color)
+            self._emitDriverChange()
+
+    def _setDeviceCenterColor(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorCenter( red, green, blue )
-        self._emitDriverChange()
 
     def _rightColorChanged(self, color):
+        with WatcherBlocker(self.watcher):
+            self._setDeviceRightColor(color)
+            self._emitDriverChange()
+
+    def _setDeviceRightColor(self, color):
         red = color.red()
         green = color.green()
         blue = color.blue()
         self.driver.setColorRight( red, green, blue )
-        self._emitDriverChange()
 
     def _setLeftToAll(self):
         color = self.ui.leftColor.getColor()
@@ -217,16 +266,21 @@ class DriverWidget(QtBaseClass):
 
     def _setCenterToAll(self):
         color = self.ui.centerColor.getColor()
-        self.ui.leftColor.setColor(color)
-        self.ui.rightColor.setColor(color)
+        with WatcherBlocker(self.watcher):
+            self.ui.leftColor.updateWidget(color)
+            self.ui.rightColor.updateWidget(color)
+            self._setDeviceLeftColor(color)
+            self._setDeviceRightColor(color)
 
     def _setRightToAll(self):
         color = self.ui.rightColor.getColor()
-        self.ui.leftColor.setColor(color)
-        self.ui.centerColor.setColor(color)
+        with WatcherBlocker(self.watcher):
+            self.ui.leftColor.updateWidget(color)
+            self.ui.centerColor.updateWidget(color)
+            self.ui.leftColor.updateWidget(color)
+            self._setDeviceCenterColor(color)
 
     def _emitDriverChange(self):
-        ##self.watcher.ignoreNextEvent()
         self.driverChanged.emit( self.driver )
 
     @staticmethod

@@ -238,17 +238,15 @@ class TuxedoDriver( ClevoDriver ):
         return self.DRIVERFS_PATH
 
     def _read(self, fileType: FilePath):
-        _LOGGER.debug("reading from file: %s", fileType)
         filePath = self._getFile( fileType )
         file = None
         try:
             file = open( filePath, "r")
             dataStr = str(file.readline())
             dataStr = dataStr.rstrip()
-            _LOGGER.debug("returning value: %s", dataStr)
+            #_LOGGER.debug("file %s: returning value: %s", fileType, dataStr)
             return dataStr
-        except PermissionError:
-#           sys.exit("needs to be run as root!")
+        except Exception:
             _LOGGER.error("unable to read data for file[%s]", filePath)
             raise
         finally:

@@ -60,7 +60,6 @@ class SettingsWidget(QtBaseClass):
 
     def readDriverState(self, driver):
         self.driverState = driver.readDriverState()
-        ##_LOGGER.info("driver state: %r", self.driverState)
 
     def requestDriverRestore(self):
         self._emitDriverRestore( True )
@@ -155,6 +154,7 @@ class SettingsWidget(QtBaseClass):
         self.ui.trayThemeCB.setCurrentIndex( themeIndex )
 
     def _emitDriverRestore(self, emitState=True):
+        _LOGGER.debug("emitting restore driver signal: %r", emitState)
         if emitState is True:
             self.restoreDriver.emit( self.driverState )
         else:
