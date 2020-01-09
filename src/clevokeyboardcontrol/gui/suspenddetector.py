@@ -88,13 +88,13 @@ class QSingletonMeta(QObjectMeta, SingletonMeta):
 class QSuspendSingleton( QtCore.QObject, metaclass=QSingletonMeta ):
     """Singleton."""
 
-    resumed   = pyqtSignal()
+    systemResumed = pyqtSignal()
     _instance = None
 
     def __init__(self):
         super().__init__( qApp )
         self.timer = QSuspendTimer( self )
-        self.timer.resumed.connect( self.resumed )
+        self.timer.resumed.connect( self.systemResumed )
         self.timer.start()
 
     @classmethod
@@ -111,13 +111,14 @@ class QSuspendSingleton( QtCore.QObject, metaclass=QSingletonMeta ):
 
 class QSuspendDetector( QtCore.QObject ):
 
-    resumed  = pyqtSignal()
+    systemResumed = pyqtSignal()
 
     def __init__(self, parent):
         super().__init__( parent )
         self.detector = QSuspendSingleton()
 
     def setEnabled(self, enable=True):
+        _LOGGER.debug("changing suspend detector state to %s" % enable)
         if enable:
             self.start()
         else:
@@ -125,9 +126,8 @@ class QSuspendDetector( QtCore.QObject ):
 
     def start(self):
         _LOGGER.debug("starting suspension detector")
-        self.detector.resumed.connect( self.resumed )
+        self.detector.systemResumed.connect( self.systemResumed )
 
     def stop(self):
         _LOGGER.debug("stopping suspension detector")
-        self.detector.resumed.disconnect( self.resumed )
-
+        self.detector.systemResumed.disconnect( self.systemResumed )

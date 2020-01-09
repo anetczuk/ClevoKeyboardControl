@@ -62,7 +62,14 @@ class SettingsWidget(QtBaseClass):
         self.driverState = driver.readDriverState()
 
     def requestDriverRestore(self):
+        _LOGGER.debug( "request driver restore received" )
         self._emitDriverRestore( True )
+        
+    def isRestoreFromSuspendEnabled(self):
+        return self.ui.restoreSuspendCB.isChecked()
+    
+    def isScreenSaverLEDEnabled(self):
+        return self.ui.screenSaverLEDOffCB.isChecked()
 
     ## =====================================================
 
