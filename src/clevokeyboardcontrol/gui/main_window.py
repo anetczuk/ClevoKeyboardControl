@@ -63,8 +63,7 @@ class MainWindow(QtBaseClass):
         ## configure objects
         self.suspendDetector = suspenddetector.QSuspendDetector(self)
         self.suspendDetector.systemResumed.connect( self.ui.settingsWidget.requestDriverRestore )
-        if self.ui.settingsWidget.isRestoreFromSuspendEnabled():
-            self.suspendDetector.start()
+        self.suspendDetector.setEnabled( self.ui.settingsWidget.isRestoreFromSuspendEnabled() )
 
         self.screenSaverDetector = screensaverwatcher.ScreenSaverWatcher()
         self.screenSaverDetector.setCallback( self._screenSaverActivationCallback )
