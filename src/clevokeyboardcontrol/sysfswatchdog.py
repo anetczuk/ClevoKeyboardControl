@@ -89,16 +89,16 @@ class WatcherBlocker:
     def __enter__(self):
         if self.watcher is None:
             return
-        _LOGGER.debug( "disabling sysfs watcher" )
         self.oldEnabled = self.watcher.setEnabled( False )
+        _LOGGER.debug( "disabling sysfs watcher, prev state: %s" % self.oldEnabled )
         self.watcher.ignoreNextEvent()
 
     def __exit__(self, exceptionType, value, traceback):
+        _LOGGER.debug( "restoring sysfs watcher state to %s" % self.oldEnabled )
         if self.watcher is None:
             return False                                                            ## do not suppress exceptions
         if self.oldEnabled is None:
             return False                                                            ## do not suppress exceptions
-        _LOGGER.debug( "restoring sysfs watcher state: %s" % self.oldEnabled )
         self.watcher.setEnabled( self.oldEnabled )
         return False                                                                ## do not suppress exceptions
 

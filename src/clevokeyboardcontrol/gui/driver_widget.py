@@ -40,7 +40,7 @@ class QSysFSWatcher( QtCore.QObject ):
         self.detector.setCallback( self._sysfsCallback )
 
     def setEnabled(self, newState):
-        self.detector.setEnabled(newState)
+        return self.detector.setEnabled(newState)
 
     def ignoreNextEvent(self):
         self.detector.ignoreNextEvent()
