@@ -162,6 +162,10 @@ class StatResult():
         self.mtimeField = None
 
     @property
+    def st_size(self):
+        return self.osResult.st_size
+
+    @property
     def st_ino(self):
         return self.osResult.st_ino
 
