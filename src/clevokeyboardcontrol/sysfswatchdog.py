@@ -147,9 +147,9 @@ class FileContentObserver(polling.PollingObserverVFS):
     def stat(self, path):
         if os.path.isdir( path ):
             ## _LOGGER.debug("performing stat on directory %r", path)
-            return polling.default_stat(path)
+            return os.stat(path)
         ## file case
-        defStat = polling.default_stat(path)
+        defStat = os.stat(path)
         ret = StatResult(defStat, path)
         return ret
 
