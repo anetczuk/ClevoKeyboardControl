@@ -4,3 +4,4 @@
 *.pyc
 /tmp
 /.coverage
+/venv/
