@@ -49,7 +49,7 @@ Application can be run in profiler mode passing *--profile* as command line para
 
 ## Running tests
 
-To run tests execute *src/runtests.py*. It can be run with code profiling 
+To run tests execute ```src/runtests.sh``` or ```cd src; python3 -m testclevokeyboardcontrol```. It can be run with code profiling 
 and code coverage options.
 
 In addition there is demo application not requiring installed drivers. It 
