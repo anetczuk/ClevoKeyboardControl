@@ -19,7 +19,7 @@
 
 import unittest
 
-from .clevodrivermock import ClevoDriverMock
+from testclevokeyboardcontrol.clevodrivermock import ClevoDriverMock
 
 
 class ClevoDriverTest(unittest.TestCase):
