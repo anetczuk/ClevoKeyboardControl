@@ -20,6 +20,7 @@
 import os
 import sys
 import logging
+import logging.handlers as handlers
 
 
 script_dir = os.path.dirname(__file__)
@@ -27,8 +28,11 @@ log_file = None
 
 
 def getLoggingOutputFile():
-    logDir = os.path.join(script_dir, "../../tmp")
+    logDir = os.path.join(script_dir, "../../tmp/log")
+    logDir = os.path.abspath( logDir )
+    os.makedirs( logDir, exist_ok=True )
     if os.path.isdir( logDir ) is False:
+        ## something bad happened (or unable to create directory)
         logDir = os.getcwd()
 
     logFile = os.path.join(logDir, "log.txt")
@@ -45,7 +49,9 @@ def configure( logFile=None, logLevel=None ):
     if logLevel is None:
         logLevel = logging.DEBUG
 
-    fileHandler    = logging.FileHandler( filename=log_file, mode="a+" )
+    ## rotation of log files, 1048576 equals to 1MB
+    fileHandler    = handlers.RotatingFileHandler( filename=log_file, mode="a+", maxBytes=1048576, backupCount=100 )
+    ## fileHandler    = logging.FileHandler( filename=log_file, mode="a+" )
     consoleHandler = logging.StreamHandler( stream=sys.stdout )
 
     formatter = createFormatter()
@@ -76,7 +82,8 @@ def createStdOutHandler():
 def createFormatter(loggerFormat=None):
     if loggerFormat is None:
         ## loggerFormat = '%(asctime)s,%(msecs)-3d %(levelname)-8s %(threadName)s [%(filename)s:%(lineno)d] %(message)s'
-        loggerFormat = '%(asctime)s,%(msecs)-3d %(levelname)-8s %(threadName)s %(name)s:%(funcName)s [%(filename)s:%(lineno)d] %(message)s'
+        loggerFormat = ('%(asctime)s,%(msecs)-3d %(levelname)-8s %(threadName)s %(name)s:%(funcName)s '
+                        '[%(filename)s:%(lineno)d] %(message)s')
     dateFormat = '%Y-%m-%d %H:%M:%S'
     return EmptyLineFormatter( loggerFormat, dateFormat )
     ## return logging.Formatter( loggerFormat, dateFormat )
@@ -90,7 +97,7 @@ class EmptyLineFormatter(logging.Formatter):
         msg = record.getMessage()
         clearMsg = msg.replace('\n', '')
         clearMsg = clearMsg.replace('\r', '')
-        if len(clearMsg) == 0:
+        if not clearMsg:
+            # empty
             return msg
         return super().format( record )
-
