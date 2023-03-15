@@ -1,3 +1,7 @@
 PyQt5
-watchdog>=0.9.0
 
+## starting from version 2.2.0 there is internal error under Ubuntu 20.0 and 23.0 package crashes with error:
+###     File "~/.local/lib/python3.8/site-packages/watchdog/utils/dirsnapshot.py", line 258, in <listcomp>
+###       paths = [os.path.join(root, entry.name) for entry in self.listdir(root)]
+###   AttributeError: 'str' object has no attribute 'name'
+watchdog>=0.9.0,<2.2.0
