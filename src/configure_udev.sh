@@ -29,14 +29,16 @@ done
 ## add group
 KBD_GROUP=clevo-keyboard
 
-groupadd "$KBD_GROUP"
+groupadd "$KBD_GROUP" || true
 
 
 if [ ! -z "$USER" ]; then
     echo "adding user $USER to group $KBD_GROUP"
     usermod -a -G "$KBD_GROUP" "$USER"
 else
-    echo -e "call:\n\tsudo usermod -a -G $KBD_GROUP userName\nto add user to $KBD_GROUP group"
+    echo "pass --user={user} parameter to allow given user to access the driver"
+    #echo -e "call:\n\tsudo usermod -a -G $KBD_GROUP userName\nto add user to $KBD_GROUP group"
+    exit 1
 fi
 
 

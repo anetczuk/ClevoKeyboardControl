@@ -58,7 +58,7 @@ class SysFSWatcher:
     def watch(self, directoryPath, recursiveMode: bool):
         if directoryPath is None:
             return
-        self.observer.schedule(self.event_handler, directoryPath, recursive=recursiveMode)
+        self.observer.schedule(event_handler=self.event_handler, path=directoryPath, recursive=recursiveMode)
         self.observer.start()
 
     def stop(self):
@@ -141,7 +141,7 @@ class Handler(FileSystemEventHandler):
 
 class FileContentObserver(polling.PollingObserverVFS):
 
-    def __init__(self, listdir=os.listdir):
+    def __init__(self, listdir=os.scandir):
         super().__init__(self.stat, listdir)
 
     def stat(self, path):
