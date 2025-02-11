@@ -58,7 +58,7 @@ class QSysFSWatcher( QtCore.QObject ):
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
-class DriverWidget(QtBaseClass):
+class DriverWidget(QtBaseClass):        # type: ignore
 
     driverChanged    = pyqtSignal( ClevoDriver )
     permissionDenied = pyqtSignal( )

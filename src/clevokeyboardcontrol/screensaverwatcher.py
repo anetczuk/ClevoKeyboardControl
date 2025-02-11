@@ -17,6 +17,7 @@
 #
 
 import logging
+from logging import Logger
 import os
 
 from .sysfswatchdog import SysFSWatcher
@@ -42,7 +43,7 @@ def readFile( file_path ):
 
 class DeviceWatcher():
 
-    logger = None
+    logger: Logger = None
 
     def __init__(self, driver_path, index):
         self.watcherIndex = index
@@ -116,7 +117,7 @@ class ScreenSaverWatcher():
     session is locked.
     """
 
-    logger = None
+    logger: Logger = None
 
     def __init__(self):
         self.watchers = []

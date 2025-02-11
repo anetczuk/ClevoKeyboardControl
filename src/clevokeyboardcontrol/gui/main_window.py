@@ -53,7 +53,7 @@ _LOGGER = logging.getLogger(__name__)
 UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 
 
-class MainWindow(QtBaseClass):
+class MainWindow(QtBaseClass):      # type: ignore
 
     def __init__(self, driver):
         super().__init__()
@@ -106,7 +106,7 @@ class MainWindow(QtBaseClass):
         username = getpass.getuser()
         ret = subprocess.call( ["pkexec", appDir + "/configure_udev.sh", "--user=" + username] )
         errorCode = int(ret)
-        if errorCode is not 0:
+        if errorCode != 0:
             _LOGGER.debug( "returned subprocess exit code: %s", errorCode )
             QMessageBox.critical(self, 'Error', "Could not fix driver permissions.")
             return

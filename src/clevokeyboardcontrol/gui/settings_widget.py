@@ -30,7 +30,7 @@ UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 _LOGGER = logging.getLogger(__name__)
 
 
-class SettingsWidget(QtBaseClass):
+class SettingsWidget(QtBaseClass):      # type: ignore
 
     restoreDriver            = pyqtSignal( dict )
     iconThemeChanged         = pyqtSignal( TrayIconTheme )
@@ -64,10 +64,10 @@ class SettingsWidget(QtBaseClass):
     def requestDriverRestore(self):
         _LOGGER.debug( "request driver restore received" )
         self._emitDriverRestore( True )
-        
+
     def isRestoreFromSuspendEnabled(self):
         return self.ui.restoreSuspendCB.isChecked()
-    
+
     def isScreenSaverLEDEnabled(self):
         return self.ui.screenSaverLEDOffCB.isChecked()
 

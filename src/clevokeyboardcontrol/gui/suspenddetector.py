@@ -18,8 +18,9 @@
 
 
 import logging
-
+from typing import Dict, Any
 import datetime
+
 from .qt import QtCore
 from .qt import qApp
 from .qt import pyqtSignal
@@ -63,7 +64,7 @@ class QSuspendTimer( QtCore.QObject ):
 
 
 class SingletonMeta(type):
-    _instances = {}
+    _instances: Dict[Any, Any] = {}
 
     def __call__(self, *args, **kwargs):
         if self not in self._instances:
@@ -74,7 +75,7 @@ class SingletonMeta(type):
 QObjectMeta = type(QtCore.QObject)
 
 
-class QSingletonMeta(QObjectMeta, SingletonMeta):
+class QSingletonMeta(QObjectMeta, SingletonMeta):       # type: ignore
     """
     Shared meta class of QObject's meta and Singleton.
 
@@ -98,7 +99,7 @@ class QSuspendSingleton( QtCore.QObject, metaclass=QSingletonMeta ):
 
     def start(self):
         self.timer.start()
-        
+
     def stop(self):
         self.timer.stop()
 

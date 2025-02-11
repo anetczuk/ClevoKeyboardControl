@@ -97,9 +97,9 @@ class ClevoDriver(metaclass=abc.ABCMeta):
     def setState(self, enabled: bool):
         _LOGGER.debug("setting led state: %i",  enabled)
         if enabled is True:
-            self.storeString( FilePath.STATE_PATH, 1 )
+            self.storeString( FilePath.STATE_PATH, "1" )
         else:
-            self.storeString( FilePath.STATE_PATH, 0 )
+            self.storeString( FilePath.STATE_PATH, "0" )
 
     def getBrightness(self):
         value = int( self.readString(FilePath.BRIGHTNESS_PATH) )
@@ -110,7 +110,7 @@ class ClevoDriver(metaclass=abc.ABCMeta):
         _LOGGER.debug("setting brightness: %i",  value)
         value = max(value, 0)
         value = min(value, 255)
-        self.storeString( FilePath.BRIGHTNESS_PATH, value )
+        self.storeString( FilePath.BRIGHTNESS_PATH, str(value) )
 
     def getMode(self):
         value = int( self.readString(FilePath.MODE_PATH) )

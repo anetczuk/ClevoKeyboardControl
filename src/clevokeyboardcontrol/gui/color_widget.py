@@ -31,7 +31,7 @@ UiTargetClass, QtBaseClass = uiloader.loadUiFromClassName( __file__ )
 _LOGGER = logging.getLogger(__name__)
 
 
-class ColorWidget(QtBaseClass):
+class ColorWidget(QtBaseClass):     # type: ignore
 
     colorChanged = pyqtSignal( QtGui.QColor )      ## passes RGB value
 
