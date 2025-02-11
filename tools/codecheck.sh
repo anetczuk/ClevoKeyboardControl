@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -eu
+#set -u
+
 
 ## works both under bash and sh
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
@@ -24,6 +27,8 @@ src_dir=$SCRIPT_DIR/../src
 ignore_errors=E115,E126,E201,E202,E221,E241,E262,E265,E266,E402,E501,W391,D
 
 
+echo "running pycodestyle"
+echo "to ignore warning inline add comment at the end of line: # noqa"
 pycodestyle --show-source --statistics --count --ignore=$ignore_errors $src_dir
 exit_code=$?
 
@@ -31,17 +36,20 @@ if [ $exit_code -ne 0 ]; then
     exit $exit_code
 fi
 
-echo "pep8 -- no warnings found"
+echo "pycodestyle -- no warnings found"
 
 
 ## F401 'PyQt5.QtCore' imported but unused
 ignore_errors=$ignore_errors,F401
 
 
+echo "running flake8"
+echo "to ignore warning for one line put following comment in end of line: # noqa: <warning-code>"
 flake8 --show-source --statistics --count --ignore=$ignore_errors $src_dir
 exit_code=$?
 
 if [ $exit_code -ne 0 ]; then
+    echo -e "\nflake8 errors found"
     exit $exit_code
 fi
 

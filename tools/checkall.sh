@@ -7,9 +7,13 @@ set -eu
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 
 
-cd $SCRIPT_DIR
+cd "$SCRIPT_DIR"
 
 
-./typecheck.sh
 ./codecheck.sh
 ./doccheck.sh
+./typecheck.sh
+./mdcheck.sh
+
+
+echo -e "\neverything is fine"

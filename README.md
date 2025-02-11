@@ -23,6 +23,7 @@ restores lights settings after startup and returning from suspend state.
 - *tuxedo-keyboard* driver
 - *PyQt5*
 - *watchdog*
+- *dbus*
 
 It's recommended to install *PyQt5* by ```apt install python3-pyqt5```
 
@@ -47,15 +48,6 @@ To run application try one of:
 Application can be run in profiler mode passing *--profile* as command line parameter. 
 
 
-## Running tests
-
-To run tests execute ```src/runtests.sh``` or ```cd src; python3 -m testclevokeyboardcontrol```. It can be run with code profiling 
-and code coverage options.
-
-In addition there is demo application not requiring installed drivers. It 
-can be run by *testclevokeyboardcontrol/gui/main_window_example.py*.
-
-
 ## Autostrart
 
 You can easily add application to autostart by running *configure_autostart.sh*. 
@@ -63,13 +55,14 @@ No special proviledges required.
 
 
 ## Modules
-- clevokeyboardcontrol.main -- entry point for the application
-- testclevokeyboardcontrol -- unit tests for the application
+- `clevokeyboardcontrol.main` -- entry point for the application
+- `testclevokeyboardcontrol` -- unit tests for the application
 
 
 ## Examples of use of not obvious Python mechanisms
 - properly killing (Ctrl+C) PyQt (*sigint.py*)
 - loading of UI files and inheriting from it
+- using d-bus and integrating with Qt
 - code profiling (*cProfile*)
 - code coverage (*coverage*)
 
@@ -79,7 +72,24 @@ No special proviledges required.
 - add keyboard sleep option (after certain inactivity)
 
 
+## Development
+
+All tests, linters and content generators can be executed by simple script `./process-all.sh`.
+
+Unit tests are executed by `./src/testclevokeyboardcontrol/runtests.py`.
+
+Code linters can be run by `./tools/checkall.sh`.
+
+In case of pull requests please run `process-all.sh` before the request.
+
+#### Running tests
+
+To run tests execute ```src/runtests.sh``` or ```cd src; python3 -m testclevokeyboardcontrol```. It can be run with code profiling 
+and code coverage options.
+
+In addition there is demo application not requiring installed drivers. It 
+can be run by *testclevokeyboardcontrol/gui/main_window_example.py*.
+
+
 ## References
 - https://github.com/tuxedocomputers/tuxedo-keyboard
-
-
